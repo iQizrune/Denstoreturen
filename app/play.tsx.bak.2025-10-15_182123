@@ -33,12 +33,20 @@ useEffect(() => {
   if (!Panel) return <View style={{ flex: 1 }} />;
 return (
   <>
-    <Panel
-  onCorrect={() => { publishMeters(meters + 10); setAnswered(true); }}
-  onWrong={() => { publishMeters(meters); setAnswered(true); }}
-/>
+    <Panel />
 
     <Text>Meter: {meters}</Text>
+    <Pressable onPress={() => publishMeters(meters + 10)} style={{ marginTop: 8 }}>
+      <Text>+10 meter</Text>
+    </Pressable>
+
+    <Pressable onPress={() => { publishMeters(meters + 10); setAnswered(true); }} style={{ marginTop: 12, backgroundColor: '#16a34a', padding: 12, borderRadius: 8 }}>
+      <Text style={{ color: 'white', fontWeight: '700' }}>Riktig (+10)</Text>
+    </Pressable>
+    <Pressable onPress={() => { publishMeters(meters); setAnswered(true); }} style={{ marginTop: 8, backgroundColor: '#ef4444', padding: 12, borderRadius: 8 }}>
+      <Text style={{ color: 'white', fontWeight: '700' }}>Feil (0)</Text>
+    </Pressable>
+
     <Pressable disabled={!answered} onPress={() => router.replace(`/results?score=${meters}`)} style={{ marginTop: 12, opacity: answered ? 1 : 0.5 }}>
       <Text>Fullfør spill →</Text>
     </Pressable>

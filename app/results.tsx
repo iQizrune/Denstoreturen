@@ -1,6 +1,8 @@
 import { View, Text, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Link } from 'expo-router';
+import { publishMeters } from './lib/progressBus';
+
 
 
 export default function Results() {
@@ -27,7 +29,8 @@ export default function Results() {
         <Text style={{ fontWeight: "700" }}>Spill igjen</Text>
       </Pressable>
       <Pressable
-        onPress={() => router.replace("/")}
+        onPress={() => { publishMeters(0); router.replace("/"); }}
+
         style={{ marginTop: 12, backgroundColor: "#e5e7eb", padding: 14, borderRadius: 12 }}
       >
         <Text>Til hjem</Text>
