@@ -1,0 +1,202 @@
+# Kandidater 2025-10-15_1108
+app/kart.tsx:12:// Finn etappe-indeks fra antall meter
+app/kart.tsx:26:  const [meters, setMeters] = useState(0);
+app/kart.tsx:30:  const unsubscribe = subscribeMeters(({ meters }) => setMeters(meters | 0));
+app/kart.tsx:37:    const idx = stageIndexFromMeters(meters);
+app/kart.tsx:44:    const legProgress = Math.min(Math.max(0, meters - fromCum), legDistance);
+app/kart.tsx:57:      totalMeters: meters,
+app/kart.tsx:60:  }, [meters]);
+app/kart.tsx:79:        <Text style={s.label}>Etappe meter: </Text>
+app/lib/progressBus.ts:2:type Payload = { meters: number; ts?: number };
+app/lib/progressBus.ts:7:export function publishMeters(meters: number) {
+app/lib/progressBus.ts:8:  if (Number.isFinite(meters)) {
+app/lib/progressBus.ts:9:    const d = { meters, ts: Date.now() };
+src/banks/trick.ts:14:    correctId: "b",
+src/banks/trick.ts:25:    correctId: "b",
+src/banks/lightning.ts:7:      correctId: "c" },
+src/banks/lightning.ts:10:      correctId: "b" },
+src/banks/lightning.ts:13:      correctId: "a" },
+src/banks/lightning.ts:16:      correctId: "a" },
+src/banks/lightning.ts:19:      correctId: "a" },
+src/banks/lightning.ts:22:      correctId: "b" },
+src/banks/lightning.ts:24:      options: [{ id:"a",label:"800 meter"},{ id:"b",label:"100 meter"},{ id:"c",label:"1500 meter"},{ id:"d",label:"Maraton"}],
+src/banks/lightning.ts:25:      correctId: "b" },
+src/banks/lightning.ts:28:      correctId: "b" },
+src/banks/lightning.ts:31:      correctId: "b" },
+src/banks/lightning.ts:34:      correctId: "a" },
+src/banks/lightning.ts:37:      correctId: "b" },
+src/banks/lightning.ts:40:      correctId: "a" },
+src/banks/lightning.ts:43:      correctId: "c" },
+src/banks/lightning.ts:46:      correctId: "b" },
+src/banks/lightning.ts:49:      correctId: "b" },
+src/banks/lightning.ts:54:      correctId:"b" },
+src/banks/lightning.ts:57:      correctId:"c" },
+src/banks/lightning.ts:60:      correctId:"b" },
+src/banks/lightning.ts:63:      correctId:"c" },
+src/banks/lightning.ts:66:      correctId:"a" },
+src/banks/lightning.ts:69:      correctId:"b" },
+src/banks/lightning.ts:72:      correctId:"b" },
+src/banks/lightning.ts:75:      correctId:"a" },
+src/banks/lightning.ts:78:      correctId:"a" },
+src/banks/lightning.ts:81:      correctId:"a" },
+src/banks/lightning.ts:84:      correctId:"c" },
+src/banks/lightning.ts:87:      correctId:"a" },
+src/banks/lightning.ts:90:      correctId:"c" },
+src/banks/lightning.ts:93:      correctId:"b" },
+src/banks/lightning.ts:96:      correctId:"a" },
+src/banks/lightning.ts:101:      correctId:"b" },
+src/banks/lightning.ts:104:      correctId:"a" },
+src/banks/lightning.ts:107:      correctId:"b" },
+src/banks/lightning.ts:110:      correctId:"b" },
+src/banks/lightning.ts:113:      correctId:"c" },
+src/banks/lightning.ts:116:      correctId:"a" },
+src/banks/lightning.ts:119:      correctId:"b" },
+src/banks/lightning.ts:122:      correctId:"b" },
+src/banks/lightning.ts:125:      correctId:"b" },
+src/banks/lightning.ts:128:      correctId:"a" },
+src/banks/lightning.ts:131:      correctId:"b" },
+src/banks/lightning.ts:134:      correctId:"c" },
+src/banks/lightning.ts:137:      correctId:"b" },
+src/banks/lightning.ts:140:      correctId:"b" },
+src/banks/lightning.ts:143:      correctId:"a" },
+src/banks/lightning.ts:148:      correctId:"b" },
+src/banks/lightning.ts:151:      correctId:"b" },
+src/banks/lightning.ts:154:      correctId:"c" },
+src/banks/lightning.ts:157:      correctId:"b" },
+src/banks/lightning.ts:160:      correctId:"a" },
+src/banks/lightning.ts:163:      correctId:"b" },
+src/banks/lightning.ts:166:      correctId:"a" },
+src/banks/lightning.ts:169:      correctId:"b" },
+src/banks/lightning.ts:172:      correctId:"a" },
+src/banks/lightning.ts:175:      correctId:"c" },
+src/banks/lightning.ts:178:      correctId:"b" },
+src/banks/lightning.ts:181:      correctId:"b" },
+src/banks/lightning.ts:184:      correctId:"a" },
+src/banks/lightning.ts:187:      correctId:"a" },
+src/banks/lightning.ts:190:      correctId:"b" },
+src/banks/bonus.ts:15:    correctId: "a",
+src/banks/bonus.ts:30:    correctId: "a",
+src/banks/bonus.ts:45:    correctId: "a",
+src/banks/flags.ts:4:export function makeFlagQ(answer: string, image: string, labels: string[]): Q {
+src/banks/flags.ts:6:  const correctId = String.fromCharCode(97 + labels.indexOf(answer));
+src/banks/flags.ts:13:    correctId,
+src/banks/extraLife.ts:15:    correctId: "a",
+src/banks/extraLife.ts:27:    correctId: "b",
+src/banks/extraLife.ts:37:    correctId: "kbh"
+src/banks/extraLife.ts:47:    correctId: "60"
+src/banks/extraLife.ts:57:    correctId: "fossekall"
+src/banks/extraLife.ts:67:    correctId: "atlanterhavet"
+src/banks/extraLife.ts:77:    correctId: "mars"
+src/banks/extraLife.ts:87:    correctId: "19"
+src/banks/extraLife.ts:97:    correctId: "portugisisk"
+src/banks/extraLife.ts:107:    correctId: "shakespeare"
+src/banks/reveal.ts:15:  correctId: string;
+src/banks/reveal.ts:23:  correctText: string,
+src/banks/reveal.ts:30:  const correct = options.find((o) => o.text === correctText);
+src/banks/reveal.ts:31:  if (!correct) {
+src/banks/reveal.ts:32:    throw new Error(`Correct choice "${correctText}" not found in choices for ${id}`);
+src/banks/reveal.ts:40:    correctId: correct.id,
+src/banks/core.ts:15:    correctId: "a",
+src/banks/core.ts:28:    correctId: "b",
+src/banks/core.ts:44:    correctId: "b",
+src/banks/core.ts:57:    correctId: "b",
+src/banks/core.ts:73:    correctId: "a",
+src/banks/core.ts:86:    correctId: "c",
+src/banks/core.ts:102:    correctId: "b",
+src/banks/core.ts:115:    correctId: "c",
+src/banks/types.ts:14:  correctId: string;
+src/banks/sequence.ts:15:  const correctId = String(q?.correctId ?? (opts.find((o:any)=>o?.correct)?.id ?? ''))
+src/banks/sequence.ts:20:    options: opts.map((o:any)=>({ id: String(o?.id ?? o?.value ?? o?.key), label: String(o?.label ?? o?.text ?? o?.name ?? o?.id), correct: !!o?.correct })),
+src/banks/sequence.ts:21:    correctId,
+src/banks/byer.ts:22:    correctId: "a",
+src/banks/byer.ts:35:    correctId: "b",
+src/banks/byer.ts:48:    correctId: "b",
+src/banks/byer.ts:61:    correctId: "c",
+src/banks/byer.ts:74:    correctId: "a",
+src/banks/byer.ts:87:  correctId: "a",
+src/banks/byer.ts:100:  correctId: "b",
+src/banks/byer.ts:113:  correctId: "c",
+src/banks/byer.ts:126:  correctId: "a",
+src/banks/byer.ts:139:  correctId: "a",
+src/banks/byer.ts:152:  correctId: "a",
+src/banks/byer.ts:165:  correctId: "b",
+src/banks/byer.ts:178:  correctId: "d",
+src/banks/byer.ts:191:  correctId: "a",
+src/banks/byer.ts:204:  correctId: "c",
+src/banks/byer.ts:217:  correctId: "a",
+src/banks/byer.ts:230:  correctId: "a",
+src/banks/byer.ts:241:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:250:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:259:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:268:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:277:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:286:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:296:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:305:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:314:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:323:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:332:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:341:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:351:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:360:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:369:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:378:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:387:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:396:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:406:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:415:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:424:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:433:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:442:  correctId: "a", meta: { difficulty: "medium" as Difficulty } },
+src/banks/byer.ts:451:  correctId: "a", meta: { difficulty: "easy" as Difficulty } },
+src/banks/byer.ts:462:    correctId: "b",
+src/banks/byer.ts:475:    correctId: "a",
+src/banks/byer.ts:488:    correctId: "a",
+src/banks/byer.ts:501:    correctId: "a",
+src/banks/byer.ts:515:    correctId: "a",
+src/banks/byer.ts:528:    correctId: "c",
+src/banks/byer.ts:541:    correctId: "a",
+src/banks/byer.ts:554:    correctId: "a",
+src/banks/byer.ts:567:    correctId: "b",
+src/banks/byer.ts:580:    correctId: "b",
+src/dev/EventLog.ts:2:  | "phase-change"
+src/dev/EventLog.ts:5:  | "stop/answer"
+src/dev/EventLog.ts:6:  | "meter/change"
+app/play.tsx:4:export default function PlayScreen() {
+app/ui/ConfettiBurst.tsx:5:export default function ConfettiBurst({ visible }: { visible: boolean }) {
+src/partials/PlayingPanels.tsx:3:export default function PlayingPanels() {
+app/_layout.tsx:5:export default function RootLayout() {
+app/kart.tsx:25:export default function KartScreen() {
+app/home.tsx:4:export default function HomeScreen() {
+app/lib/kartBus.ts:31:export function publishKart(cmd: KartCmd) {
+app/lib/kartBus.ts:35:export function subscribeKart(fn: Listener): () => void {
+app/lib/kartBus.ts:47:export default function __route_stub__() {
+src/banks/util.ts:2:export function shuffle<T>(arr: T[]): T[] {
+app/lib/progressBus.ts:7:export function publishMeters(meters: number) {
+app/lib/progressBus.ts:14:export function subscribeMeters(fn: Listener) {
+app/lib/progressBus.ts:20:export default function __route_stub__() {
+src/banks/flags.ts:4:export function makeFlagQ(answer: string, image: string, labels: string[]): Q {
+app/results.tsx:4:export default function Results() {
+app/avatar.tsx:25:export default function AvatarScreen() {
+src/banks/sequence.ts:29:export function buildMainManagedSequence(): any[] {
+app/+not-found.tsx:2:export default function NotFound() {
+src/banks/lightning.ts:194:export function lightningBank(cat: "sport" | "kunst" | "historie" | "musikk") {
+src/data/coatLookup.ts:4:export function getCoatImage(slug: string) {
+src/data/coatLookup.ts:9:export function getCoatImageSafe(slug: string) {
+src/features/profile/HomePhasePanel.tsx:3:export default function HomePhasePanel() {
+src/data/helpemidler.ts:32:export function isHelpValidFor(helpId: string, stopId: string): boolean {
+src/data/helpemidler.ts:37:export function getHelpTitle(helpId: string): string {
+src/dev/EventLog.ts:10:export function setEventLogEnabled(value: boolean) { enabled = value; }
+src/dev/EventLog.ts:11:export function logEvent(type: EventType | string, payload?: unknown) {
+app/play.tsx:1:import React, { useEffect, useState } from 'react';
+app/play.tsx:6:  useEffect(() => {
+app/avatar.tsx:2:import React, { useEffect, useState } from "react";
+app/avatar.tsx:30:  useEffect(() => {
+app/kart.tsx:2:import React, { useEffect, useMemo, useState } from "react";
+app/kart.tsx:29:  useEffect(() => {
+app/home.tsx:1:import React, { useEffect, useState } from 'react';
+app/home.tsx:7:  useEffect(() => {
+app/ui/ConfettiBurst.tsx:2:import React, { useEffect, useRef } from "react";
+app/ui/ConfettiBurst.tsx:9:  useEffect(() => {
+src/dev/EventLog.ts:3:  | "stop/mount"
+src/dev/EventLog.ts:4:  | "stop/unmount"

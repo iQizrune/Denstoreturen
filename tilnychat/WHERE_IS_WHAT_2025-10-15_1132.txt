@@ -1,0 +1,49 @@
+app/_layout.tsx:5:export default function RootLayout() {
+src/partials/PlayingPanels.tsx:3:export default function PlayingPanels() {
+src/partials/PlayingPanels.tsx:4:  return <View style={{ padding: 16 }}><Text>PlayingPanels (stub)</Text></View>;
+app/play.tsx:4:export default function PlayScreen() {
+app/play.tsx:8:    import('@/src/partials/PlayingPanels')
+app/lib/kartBus.ts:31:export function publishKart(cmd: KartCmd) {
+app/lib/kartBus.ts:35:export function subscribeKart(fn: Listener): () => void {
+app/lib/kartBus.ts:47:export default function __route_stub__() {
+src/engine/types.ts:3:export type ConductorEvent =
+src/engine/types.ts:4:  | { type: "phase-change"; from?: Phase; to: Phase };
+app/+not-found.tsx:2:export default function NotFound() {
+src/dev/EventLog.ts:2:  | "phase-change"
+src/dev/EventLog.ts:10:export function setEventLogEnabled(value: boolean) { enabled = value; }
+src/dev/EventLog.ts:11:export function logEvent(type: EventType | string, payload?: unknown) {
+app/results.tsx:4:export default function Results() {
+app/lib/progressBus.ts:8:export function publishMeters(meters: number) {
+app/lib/progressBus.ts:15:export function subscribeMeters(fn: Listener) {
+app/lib/progressBus.ts:21:export default function __route_stub__() {
+app/home.tsx:4:export default function HomeScreen() {
+app/home.tsx:9:    import('@/src/features/profile/HomePhasePanel')
+src/engine/Conductor.ts:2:import type { Phase, ConductorEvent } from "./types";
+src/engine/Conductor.ts:4:type Listener = (e: ConductorEvent) => void;
+src/engine/Conductor.ts:6:class Conductor {
+src/engine/Conductor.ts:7:  private phase: Phase = "home";
+src/engine/Conductor.ts:11:    return this.phase;
+src/engine/Conductor.ts:24:    if (next === this.phase) return;
+src/engine/Conductor.ts:25:    const prev = this.phase;
+src/engine/Conductor.ts:26:    this.phase = next;
+src/engine/Conductor.ts:27:    try { logEvent("phase-change", { from: prev, to: next }); } catch {}
+src/engine/Conductor.ts:28:    this.emit({ type: "phase-change", from: prev, to: next });
+src/engine/Conductor.ts:31:  private emit(e: ConductorEvent): void {
+src/engine/Conductor.ts:38:export { Conductor };
+src/engine/Conductor.ts:39:export default Conductor;
+app/avatar.tsx:25:export default function AvatarScreen() {
+app/kart.tsx:25:export default function KartScreen() {
+app/ui/ConfettiBurst.tsx:5:export default function ConfettiBurst({ visible }: { visible: boolean }) {
+app/lib/progressBus.ts.bak.2025-10-15_111616:7:export function publishMeters(meters: number) {
+app/lib/progressBus.ts.bak.2025-10-15_111616:14:export function subscribeMeters(fn: Listener) {
+app/lib/progressBus.ts.bak.2025-10-15_111616:20:export default function __route_stub__() {
+src/banks/util.ts:2:export function shuffle<T>(arr: T[]): T[] {
+src/banks/lightning.ts:194:export function lightningBank(cat: "sport" | "kunst" | "historie" | "musikk") {
+src/banks/flags.ts:4:export function makeFlagQ(answer: string, image: string, labels: string[]): Q {
+src/data/helpemidler.ts:32:export function isHelpValidFor(helpId: string, stopId: string): boolean {
+src/data/helpemidler.ts:37:export function getHelpTitle(helpId: string): string {
+src/data/coatLookup.ts:4:export function getCoatImage(slug: string) {
+src/data/coatLookup.ts:9:export function getCoatImageSafe(slug: string) {
+src/banks/sequence.ts:29:export function buildMainManagedSequence(): any[] {
+src/features/profile/HomePhasePanel.tsx:3:export default function HomePhasePanel() {
+src/features/profile/HomePhasePanel.tsx:4:  return <View style={{ padding: 16 }}><Text>HomePhasePanel (stub)</Text></View>;

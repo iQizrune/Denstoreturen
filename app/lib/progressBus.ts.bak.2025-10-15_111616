@@ -1,4 +1,3 @@
-import { logEvent } from "../../src/dev/EventLog";
 // app/lib/progressBus.ts
 type Payload = { meters: number; ts?: number };
 type Listener = (d: Payload) => void;
