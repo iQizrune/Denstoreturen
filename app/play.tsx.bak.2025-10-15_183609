@@ -36,12 +36,12 @@ useEffect(() => {
 return (
   <>
     <Panel
-  onCorrect={() => { publishMeters(meters + 10); setAnswered(true); setCorrect(c => c + 1); }}
+  onCorrect={() => { publishMeters(meters + 10); setAnswered(true); }}
   onWrong={() => { publishMeters(meters); setAnswered(true); }}
 />
 
     <Text>Meter: {meters}</Text>
-    <Pressable disabled={!answered} onPress={() => router.replace(`/results?score=${meters}&correct=${correct}`)} style={{ marginTop: 12, opacity: answered ? 1 : 0.5 }}>
+    <Pressable disabled={!answered} onPress={() => router.replace(`/results?score=${meters}`)} style={{ marginTop: 12, opacity: answered ? 1 : 0.5 }}>
       <Text>Fullfør spill →</Text>
     </Pressable>
 
