@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { conductor } from '@/src/engine/conductor';
 import { BANKS } from '@/src/banks/local';
 import { POINTS_PER_CORRECT } from '@/src/config/game';
 import { View } from 'react-native';
@@ -30,8 +29,7 @@ useEffect(() => {
 
   useEffect(() => {
     let alive = true;
-    conductor.start((cat as string) || undefined);
-setCorrect(0);
+    setCorrect(0);
         setAnswered(false);
 publishMeters(0);
     console.log('[phase] play: mount');
@@ -44,16 +42,16 @@ publishMeters(0);
 return (
   <>
     <Panel bankKey={(cat as string) || "general"}
-  onCorrect={() => { conductor.answer(true); setAnswered(true); setCorrect(c => c + 1); }}
-  onWrong={() => { conductor.answer(false); setAnswered(true); }}
+  onCorrect={() => { publishMeters(meters + POINTS_PER_CORRECT); setAnswered(true); setCorrect(c => c + 1); }}
+  onWrong={() => { publishMeters(meters); setAnswered(true); }}
   onFinished={() => { try { router.replace(`/results?score=${meters}&correct=${correct}&total=${total}&cat=${(cat as string) || "general"}`); } catch {} }}
 />
 
     <Text>Meter: {meters}</Text>
-    <Pressable onPress={() => { conductor.finish(); router.replace("/results"); }} style={{ marginTop: 12, backgroundColor: '#e5e7eb', padding: 12, borderRadius: 8 }}>
+    <Pressable onPress={() => router.replace(`/results?score=${meters}&correct=${correct}&total=${total}`)} style={{ marginTop: 12, backgroundColor: '#e5e7eb', padding: 12, borderRadius: 8 }}>
       <Text>Avslutt nå</Text>
     </Pressable>
-    <Pressable disabled={!answered} onPress={() => { conductor.finish(); router.replace("/results"); }} style={{ marginTop: 12, opacity: answered ? 1 : 0.5 }}>
+    <Pressable disabled={!answered} onPress={() => router.replace(`/results?score=${meters}&correct=${correct}&total=${total}&cat=${(cat as string) || "general"}`)} style={{ marginTop: 12, opacity: answered ? 1 : 0.5 }}>
       <Text>Fullfør spill →</Text>
     </Pressable>
 
