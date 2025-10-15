@@ -42,7 +42,6 @@ const p = Math.round((k / t) * 100);
       >
         <Text>Til hjem</Text>
       </Pressable>
-      <Link href="/start" style={{ marginTop: 8, color: '#60a5fa' }}>Velg kategori</Link>
     </View>
   );
 }

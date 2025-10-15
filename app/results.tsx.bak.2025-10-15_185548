@@ -6,7 +6,7 @@ import { publishMeters } from './lib/progressBus';
 
 
 export default function Results() {
-  const { score, correct, total, cat } = useLocalSearchParams<{ score?: string; correct?: string; total?: string; cat?: string }>();
+  const { score, correct, total } = useLocalSearchParams<{ score?: string; correct?: string; total?: string }>();
 
   const router = useRouter();
   const n = Number(score ?? 0);
@@ -27,10 +27,9 @@ const p = Math.round((k / t) * 100);
       <Text style={{ color: "white", fontSize: 28, fontWeight: "700" }}>Resultat</Text>
       <Text style={{ color: "#bbb", fontSize: 18, marginTop: 8 }}>Du fikk {n} poeng 🎉</Text>
       <Text style={{ color: "#bbb", fontSize: 16, marginTop: 4 }}>Riktige svar: {k} av {t} ({p}%)</Text>
-      <Text style={{ color: "#bbb", fontSize: 14, marginTop: 2 }}>Kategori: {cat ?? "general"}</Text>
       <Text style={{ color: "#bbb", fontSize: 16, marginTop: 4 }}>Riktige svar: {k}</Text>
       <Pressable
-        onPress={() => { publishMeters(0); router.replace("/play"); }}
+        onPress={() => router.replace("/game")}
         style={{ marginTop: 24, backgroundColor: "#60a5fa", padding: 16, borderRadius: 14 }}
       >
         <Text style={{ fontWeight: "700" }}>Spill igjen</Text>
@@ -42,7 +41,6 @@ const p = Math.round((k / t) * 100);
       >
         <Text>Til hjem</Text>
       </Pressable>
-      <Link href="/start" style={{ marginTop: 8, color: '#60a5fa' }}>Velg kategori</Link>
     </View>
   );
 }
