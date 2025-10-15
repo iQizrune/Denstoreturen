@@ -24,7 +24,8 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-maps"
     ],
     "version": "1.5.0",
     "extra": {

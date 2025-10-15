@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, View, Text } from 'react-native';
 import { Link } from 'expo-router';
-import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'expo-maps';
 
 export default function KartScreen() {
   if (Platform.OS === 'web') {
@@ -16,6 +16,7 @@ export default function KartScreen() {
     );
   }
 
+  // En enkel røyk-test: Oslo → Lillehammer
   const oslo = { latitude: 59.9139, longitude: 10.7522 };
   const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
   const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
@@ -24,7 +25,6 @@ export default function KartScreen() {
     <View style={{ flex: 1 }}>
       <MapView
         style={{ flex: 1 }}
-        provider={PROVIDER_DEFAULT}
         initialRegion={{
           latitude: 60.4,
           longitude: 10.7,
