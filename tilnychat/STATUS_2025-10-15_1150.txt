@@ -1,0 +1,79 @@
+# STATUS 2025-10-15_1150
+/Users/runeandersen/Desktop/Denstoregåturen
+/Users/runeandersen/Desktop/Denstoregåturen
+## chore/conductor-wire-C3
+ M tools/log-run.sh
+?? tilnychat/RUN_LOG_2025-10-15_1141.txt
+?? tilnychat/RUN_LOG_2025-10-15_1143.txt
+?? tilnychat/RUN_LOG_2025-10-15_1146.txt
+?? tilnychat/STATUS_2025-10-15_1150.txt
+48734e11 chore: stabil base (guard-stubber, logger, docs)
+0ef891a0 chore(guard): stub make-timer-map og make-phase-map
+de21c8b0 docs: legg til tilnychat/* (samarbeid, oppsummering, appbeskrivelser)
+freeze/2025-10-15-guard-stub3
+freeze/2025-10-15-safe-base
+freeze/2025-10-15-setup-tilnychat
+v22.18.0
+10.9.3
+total 24
+drwxr-xr-x@  5 runeandersen  staff  160 Oct 15 11:34 .
+drwxr-xr-x  12 runeandersen  staff  384 Oct 15 11:25 ..
+-rw-r--r--@  1 runeandersen  staff  910 Oct 15 11:25 Conductor.ts
+-rw-r--r--@  1 runeandersen  staff  133 Oct 15 11:36 index.ts
+-rw-r--r--@  1 runeandersen  staff  143 Oct 15 11:25 types.ts
+total 72
+-rw-r--r--@  1 runeandersen  staff   269 Oct  2 22:07 _layout.tsx
+drwxr-xr-x  12 runeandersen  staff   384 Oct 15 11:36 .
+drwxr-xr-x@ 22 runeandersen  staff   704 Oct 15 11:13 ..
+-rw-r--r--@  1 runeandersen  staff  6148 Oct 12 14:19 .DS_Store
+-rw-r--r--@  1 runeandersen  staff   111 Sep 15 12:25 +not-found.tsx
+-rw-r--r--@  1 runeandersen  staff  2961 Oct 14 21:28 avatar.tsx
+-rw-r--r--@  1 runeandersen  staff   494 Oct 15 11:36 home.tsx
+-rw-r--r--@  1 runeandersen  staff  3742 Oct 14 21:46 kart.tsx
+drwxr-xr-x   5 runeandersen  staff   160 Oct 15 11:16 lib
+-rw-r--r--@  1 runeandersen  staff   482 Oct 15 11:36 play.tsx
+-rw-r--r--@  1 runeandersen  staff  1128 Oct 15 11:36 results.tsx
+drwxr-xr-x   3 runeandersen  staff    96 Oct 12 14:20 ui
+app/play.tsx:4:export default function PlayScreen() {
+app/play.tsx:8:    import('@/src/partials/PlayingPanels')
+src/partials/PlayingPanels.tsx:3:export default function PlayingPanels() {
+src/partials/PlayingPanels.tsx:4:  return <View style={{ padding: 16 }}><Text>PlayingPanels (stub)</Text></View>;
+app/avatar.tsx:25:export default function AvatarScreen() {
+app/+not-found.tsx:2:export default function NotFound() {
+app/kart.tsx:25:export default function KartScreen() {
+app/results.tsx:4:export default function Results() {
+app/_layout.tsx:5:export default function RootLayout() {
+app/lib/kartBus.ts:31:export function publishKart(cmd: KartCmd) {
+app/lib/kartBus.ts:35:export function subscribeKart(fn: Listener): () => void {
+app/lib/kartBus.ts:47:export default function __route_stub__() {
+src/engine/index.ts:1:import Conductor from "./Conductor";
+src/engine/index.ts:2:export const conductor = new Conductor();
+src/engine/index.ts:3:export type { Phase, ConductorEvent } from "./types";
+app/home.tsx:4:export default function HomeScreen() {
+app/home.tsx:9:    import('@/src/features/profile/HomePhasePanel')
+app/lib/progressBus.ts:8:export function publishMeters(meters: number) {
+app/lib/progressBus.ts:15:export function subscribeMeters(fn: Listener) {
+app/lib/progressBus.ts:21:export default function __route_stub__() {
+src/engine/types.ts:3:export type ConductorEvent =
+app/ui/ConfettiBurst.tsx:5:export default function ConfettiBurst({ visible }: { visible: boolean }) {
+src/banks/util.ts:2:export function shuffle<T>(arr: T[]): T[] {
+app/lib/progressBus.ts.bak.2025-10-15_111616:7:export function publishMeters(meters: number) {
+app/lib/progressBus.ts.bak.2025-10-15_111616:14:export function subscribeMeters(fn: Listener) {
+app/lib/progressBus.ts.bak.2025-10-15_111616:20:export default function __route_stub__() {
+src/engine/Conductor.ts:2:import type { Phase, ConductorEvent } from "./types";
+src/engine/Conductor.ts:4:type Listener = (e: ConductorEvent) => void;
+src/engine/Conductor.ts:6:class Conductor {
+src/engine/Conductor.ts:31:  private emit(e: ConductorEvent): void {
+src/engine/Conductor.ts:38:export { Conductor };
+src/engine/Conductor.ts:39:export default Conductor;
+src/data/coatLookup.ts:4:export function getCoatImage(slug: string) {
+src/data/coatLookup.ts:9:export function getCoatImageSafe(slug: string) {
+src/features/profile/HomePhasePanel.tsx:3:export default function HomePhasePanel() {
+src/features/profile/HomePhasePanel.tsx:4:  return <View style={{ padding: 16 }}><Text>HomePhasePanel (stub)</Text></View>;
+src/banks/flags.ts:4:export function makeFlagQ(answer: string, image: string, labels: string[]): Q {
+src/dev/EventLog.ts:10:export function setEventLogEnabled(value: boolean) { enabled = value; }
+src/dev/EventLog.ts:11:export function logEvent(type: EventType | string, payload?: unknown) {
+src/data/helpemidler.ts:32:export function isHelpValidFor(helpId: string, stopId: string): boolean {
+src/data/helpemidler.ts:37:export function getHelpTitle(helpId: string): string {
+src/banks/sequence.ts:29:export function buildMainManagedSequence(): any[] {
+src/banks/lightning.ts:194:export function lightningBank(cat: "sport" | "kunst" | "historie" | "musikk") {

@@ -1,0 +1,23 @@
+# Run-logg Wed Oct 15 11:46:06 CEST 2025
+[log] root: /Users/runeandersen/Desktop/Denstoregåturen
+[log] node: v22.18.0
+[log] npm : 10.9.3
+OK: health checks passed
+[report:imports] start
+status: ok (stub)
+details: bruker stub i tools/check-import-paths.js
+[report:imports] end
+[report:timers] start
+status: ok (stub)
+details: bruker stub i tools/make-timer-map.js
+[report:timers] end
+[report:phases] start
+status: ok (stub)
+details: bruker stub i tools/make-phase-map.js
+[report:phases] end
+[log] starting dev server on port 8083
+Starting project at /Users/runeandersen/Desktop/Denstoregåturen
+Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.
+Starting Metro Bundler
+Waiting on http://localhost:8083
+Logs for your project will appear below.
