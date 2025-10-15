@@ -5,7 +5,7 @@ import { Link } from 'expo-router';
 export default function Kart() {
   return (
     <View style={{ flex: 1, backgroundColor: '#111', padding: 24, gap: 12, justifyContent: 'center' }}>
-      <Text style={{ color: 'white', fontSize: 22, fontWeight: '700' }}>Kart (stub, felles)</Text>
+      <Text style={{ color: 'white', fontSize: 22, fontWeight: '700' }}>Kart (stub)</Text>
       <Link href="/start" style={{ color: '#60a5fa' }}>Til start</Link>
     </View>
   );
