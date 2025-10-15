@@ -6,13 +6,11 @@ import { publishMeters } from './lib/progressBus';
 
 
 export default function Results() {
-  const { score, correct, total } = useLocalSearchParams<{ score?: string; correct?: string; total?: string }>();
+  const { score, correct } = useLocalSearchParams<{ score?: string; correct?: string }>();
 
   const router = useRouter();
   const n = Number(score ?? 0);
 const k = Number(correct ?? 0);
-const t = Math.max(1, Number(total ?? 0));
-const p = Math.round((k / t) * 100);
   console.log('[phase] results: mount');
   return (
     <View
@@ -26,7 +24,6 @@ const p = Math.round((k / t) * 100);
     >
       <Text style={{ color: "white", fontSize: 28, fontWeight: "700" }}>Resultat</Text>
       <Text style={{ color: "#bbb", fontSize: 18, marginTop: 8 }}>Du fikk {n} poeng 🎉</Text>
-      <Text style={{ color: "#bbb", fontSize: 16, marginTop: 4 }}>Riktige svar: {k} av {t} ({p}%)</Text>
       <Text style={{ color: "#bbb", fontSize: 16, marginTop: 4 }}>Riktige svar: {k}</Text>
       <Pressable
         onPress={() => router.replace("/game")}

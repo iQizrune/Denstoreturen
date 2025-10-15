@@ -6,10 +6,9 @@ import { POINTS_PER_CORRECT } from "../config/game";
 type Props = {
   onCorrect?: () => void;
   onWrong?: () => void;
-  onFinished?: () => void;
 };
 
-export default function PlayingPanels({ onCorrect, onWrong, onFinished }: Props) {
+export default function PlayingPanels({ onCorrect, onWrong }: Props) {
   const [idx, setIdx] = useState(0);
   const [answered, setAnswered] = useState<null | "correct" | "wrong">(null);
 
@@ -24,12 +23,7 @@ export default function PlayingPanels({ onCorrect, onWrong, onFinished }: Props)
 
   function next() {
     if (!answered) return;
-    setIdx((i) => {
-      const n = i + 1;
-      if (n >= BANK.length) { try { onFinished?.(); } catch {}
-      }
-      return n;
-    });
+    setIdx((i) => i + 1);
     setAnswered(null);
   }
 

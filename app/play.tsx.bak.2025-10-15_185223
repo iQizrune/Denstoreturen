@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BANK } from '@/src/banks/local';
 import { POINTS_PER_CORRECT } from '@/src/config/game';
 import { View } from 'react-native';
 import { Link } from 'expo-router';
@@ -41,7 +40,6 @@ return (
     <Panel
   onCorrect={() => { publishMeters(meters + POINTS_PER_CORRECT); setAnswered(true); setCorrect(c => c + 1); }}
   onWrong={() => { publishMeters(meters); setAnswered(true); }}
-  onFinished={() => { try { router.replace(`/results?score=${meters}&correct=${correct}&total=${BANK.length}`); } catch {} }}
 />
 
     <Text>Meter: {meters}</Text>
