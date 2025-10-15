@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "iQiz",
+    "slug": "iqiz",
+    "scheme": "iqiz",
+    "icon": "./assets/images/icon.square.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rune1971.iqiz"
+    },
+    "android": {
+      "package": "com.rune1971.iqiz",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCuMJNc5_urPFXI6yRknpylwPUs77oX8gQ"
+        }
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.square.png",
+        "backgroundColor": "#000000"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "version": "1.5.0",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e3b95268-6e10-4f32-82da-bae2c16e3f8b"
+      }
+    },
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  }
+}

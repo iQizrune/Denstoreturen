@@ -1,0 +1,302 @@
+{
+  "lindesnes-fyr": {
+    "file": "byvapen/01-lindesnes-fyr.svg",
+    "title": "lindesnes-fyr",
+    "slug": "lindesnes-fyr"
+  },
+  "mandal": {
+    "file": "byvapen/02-mandal.svg",
+    "title": "Mandal",
+    "slug": "mandal"
+  },
+  "kristiansand": {
+    "file": "byvapen/03-kristiansand.svg",
+    "title": "Kristiansand",
+    "slug": "kristiansand"
+  },
+  "grimstad": {
+    "file": "byvapen/04-grimstad.svg",
+    "title": "Grimstad",
+    "slug": "grimstad"
+  },
+  "arendal": {
+    "file": "byvapen/05-arendal.svg",
+    "title": "Arendal",
+    "slug": "arendal"
+  },
+  "risor": {
+    "file": "byvapen/06-risor.svg",
+    "title": "Risør",
+    "slug": "risor"
+  },
+  "farsund": {
+    "file": "byvapen/07-farsund.svg",
+    "title": "Farsund",
+    "slug": "farsund"
+  },
+  "flekkefjord": {
+    "file": "byvapen/08-flekkefjord.svg",
+    "title": "Flekkefjord",
+    "slug": "flekkefjord"
+  },
+  "skien": {
+    "file": "byvapen/09-skien.svg",
+    "title": "Skien",
+    "slug": "skien"
+  },
+  "porsgrunn": {
+    "file": "byvapen/10-porsgrunn.svg",
+    "title": "Porsgrunn",
+    "slug": "porsgrunn"
+  },
+  "notodden": {
+    "file": "byvapen/11-notodden.svg",
+    "title": "Notodden",
+    "slug": "notodden"
+  },
+  "kongsberg": {
+    "file": "byvapen/12-kongsberg.svg",
+    "title": "Kongsberg",
+    "slug": "kongsberg"
+  },
+  "larvik": {
+    "file": "byvapen/13-larvik.svg",
+    "title": "Larvik",
+    "slug": "larvik"
+  },
+  "sandefjord": {
+    "file": "byvapen/14-sandefjord.svg",
+    "title": "Sandefjord",
+    "slug": "sandefjord"
+  },
+  "tonsberg": {
+    "file": "byvapen/15-tonsberg.svg",
+    "title": "Tønsberg",
+    "slug": "tonsberg"
+  },
+  "horten": {
+    "file": "byvapen/16-horten.svg",
+    "title": "Horten",
+    "slug": "horten"
+  },
+  "holmestrand": {
+    "file": "byvapen/17-holmestrand.svg",
+    "title": "Holmestrand",
+    "slug": "holmestrand"
+  },
+  "drammen": {
+    "file": "byvapen/18-drammen.svg",
+    "title": "Drammen",
+    "slug": "drammen"
+  },
+  "honefoss": {
+    "file": "byvapen/19-honefoss.svg",
+    "title": "Hønefoss",
+    "slug": "honefoss"
+  },
+  "oslo": {
+    "file": "byvapen/20-oslo.svg",
+    "title": "Oslo",
+    "slug": "oslo"
+  },
+  "moss": {
+    "file": "byvapen/21-moss.svg",
+    "title": "Moss",
+    "slug": "moss"
+  },
+  "sarpsborg": {
+    "file": "byvapen/22-sarpsborg.svg",
+    "title": "Sarpsborg",
+    "slug": "sarpsborg"
+  },
+  "fredrikstad": {
+    "file": "byvapen/23-fredrikstad.svg",
+    "title": "Fredrikstad",
+    "slug": "fredrikstad"
+  },
+  "halden": {
+    "file": "byvapen/24-halden.svg",
+    "title": "Halden",
+    "slug": "halden"
+  },
+  "kongsvinger": {
+    "file": "byvapen/25-kongsvinger.svg",
+    "title": "Kongsvinger",
+    "slug": "kongsvinger"
+  },
+  "hamar": {
+    "file": "byvapen/26-hamar.svg",
+    "title": "Hamar",
+    "slug": "hamar"
+  },
+  "gjovik": {
+    "file": "byvapen/27-gjovik.svg",
+    "title": "Gjøvik",
+    "slug": "gjovik"
+  },
+  "lillehammer": {
+    "file": "byvapen/28-lillehammer.svg",
+    "title": "Lillehammer",
+    "slug": "lillehammer"
+  },
+  "besseggen": {
+    "file": "byvapen/29-besseggen.svg",
+    "title": "besseggen",
+    "slug": "besseggen"
+  },
+  "trondheim": {
+    "file": "byvapen/30-trondheim.svg",
+    "title": "Trondheim",
+    "slug": "trondheim"
+  },
+  "steinkjer": {
+    "file": "byvapen/31-steinkjer.svg",
+    "title": "Steinkjer",
+    "slug": "steinkjer"
+  },
+  "namsos": {
+    "file": "byvapen/32-namsos.svg",
+    "title": "Namsos",
+    "slug": "namsos"
+  },
+  "trollstigen": {
+    "file": "byvapen/33-trollstigen.svg",
+    "title": "trollstigen",
+    "slug": "trollstigen"
+  },
+  "molde": {
+    "file": "byvapen/34-molde.svg",
+    "title": "Molde",
+    "slug": "molde"
+  },
+  "alesund": {
+    "file": "byvapen/35-alesund.svg",
+    "title": "Ålesund",
+    "slug": "alesund"
+  },
+  "kristiansund": {
+    "file": "byvapen/36-kristiansund.svg",
+    "title": "Kristiansund",
+    "slug": "kristiansund"
+  },
+  "atlanterhavsvegen": {
+    "file": "byvapen/37-atlanterhavsvegen.svg",
+    "title": "atlanterhavsvegen",
+    "slug": "atlanterhavsvegen"
+  },
+  "bergen": {
+    "file": "byvapen/38-bergen.svg",
+    "title": "Bergen",
+    "slug": "bergen"
+  },
+  "floro": {
+    "file": "byvapen/39-floro.svg",
+    "title": "Florø",
+    "slug": "floro"
+  },
+  "egersund": {
+    "file": "byvapen/40-egersund.svg",
+    "title": "Egersund",
+    "slug": "egersund"
+  },
+  "haugesund": {
+    "file": "byvapen/41-haugesund.svg",
+    "title": "Haugesund",
+    "slug": "haugesund"
+  },
+  "sandnes": {
+    "file": "byvapen/42-sandnes.svg",
+    "title": "Sandnes",
+    "slug": "sandnes"
+  },
+  "stavanger": {
+    "file": "byvapen/43-stavanger.svg",
+    "title": "Stavanger",
+    "slug": "stavanger"
+  },
+  "skudeneshavn": {
+    "file": "byvapen/44-skudeneshavn.svg",
+    "title": "Skudeneshavn",
+    "slug": "skudeneshavn"
+  },
+  "gaustatoppen": {
+    "file": "byvapen/45-gaustatoppen.svg",
+    "title": "gaustatoppen",
+    "slug": "gaustatoppen"
+  },
+  "dovrefjell": {
+    "file": "byvapen/46-dovrefjell.svg",
+    "title": "Dovrefjell (Hjerkinn)",
+    "slug": "dovrefjell"
+  },
+  "bodo": {
+    "file": "byvapen/47-bodo.svg",
+    "title": "Bodø",
+    "slug": "bodo"
+  },
+  "saltstraumen": {
+    "file": "byvapen/48-saltstraumen.svg",
+    "title": "saltstraumen",
+    "slug": "saltstraumen"
+  },
+  "narvik": {
+    "file": "byvapen/49-narvik.svg",
+    "title": "Narvik",
+    "slug": "narvik"
+  },
+  "harstad": {
+    "file": "byvapen/50-harstad.svg",
+    "title": "Harstad",
+    "slug": "harstad"
+  },
+  "tromso": {
+    "file": "byvapen/51-tromso.svg",
+    "title": "Tromsø",
+    "slug": "tromso"
+  },
+  "mosjoen": {
+    "file": "byvapen/52-mosjoen.svg",
+    "title": "Mosjøen",
+    "slug": "mosjoen"
+  },
+  "mo-i-rana": {
+    "file": "byvapen/53-mo-i-rana.svg",
+    "title": "Mo i Rana",
+    "slug": "mo-i-rana"
+  },
+  "polarsirkelsenteret": {
+    "file": "byvapen/54-polarsirkelsenteret.svg",
+    "title": "polarsirkelsenteret",
+    "slug": "polarsirkelsenteret"
+  },
+  "alta": {
+    "file": "byvapen/55-alta.svg",
+    "title": "Alta",
+    "slug": "alta"
+  },
+  "hammerfest": {
+    "file": "byvapen/56-hammerfest.svg",
+    "title": "Hammerfest",
+    "slug": "hammerfest"
+  },
+  "vadso": {
+    "file": "byvapen/57-vadso.svg",
+    "title": "Vadsø",
+    "slug": "vadso"
+  },
+  "vardo": {
+    "file": "byvapen/58-vardo.svg",
+    "title": "Vardø",
+    "slug": "vardo"
+  },
+  "nordkapp-plataet": {
+    "file": "byvapen/59-nordkapp-plataet.svg",
+    "title": "nordkapp-plataet",
+    "slug": "nordkapp-plataet"
+  },
+  "kirkenes": {
+    "file": "byvapen/60-kirkenes.svg",
+    "title": "kirkenes",
+    "slug": "kirkenes"
+  }
+}

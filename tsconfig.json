@@ -1,0 +1,49 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "ES2020",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "types": [
+      "react",
+      "react-native",
+      "expo"
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "app",
+    "src",
+    "index.ts",
+    "index.tsx",
+    "src/types/**/*.d.ts"
+  ],
+  "exclude": [
+    "_archive/**/*",
+    "build",
+    "dist",
+    "node_modules",
+    "**/*.bak",
+    "**/*.bak_*",
+    "**/*.WIP-*",
+    "**/*~"
+  ]
+  
+}
+

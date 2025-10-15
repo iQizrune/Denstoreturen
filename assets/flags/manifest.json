@@ -1,0 +1,106 @@
+[
+  {
+    "image": "/assets/flags/algerie.png",
+    "name": "Algerie"
+  },
+  {
+    "image": "/assets/flags/andorra.png",
+    "name": "Andorra"
+  },
+  {
+    "image": "/assets/flags/austria.png",
+    "name": "Østerrike"
+  },
+  {
+    "image": "/assets/flags/brazil.png",
+    "name": "Brasil"
+  },
+  {
+    "image": "/assets/flags/canada.png",
+    "name": "Canada"
+  },
+  {
+    "image": "/assets/flags/china.png",
+    "name": "Kina"
+  },
+  {
+    "image": "/assets/flags/finland.png",
+    "name": "Finland"
+  },
+  {
+    "image": "/assets/flags/gambia.png",
+    "name": "Gambia"
+  },
+  {
+    "image": "/assets/flags/germany.png",
+    "name": "Tyskland"
+  },
+  {
+    "image": "/assets/flags/greece.png",
+    "name": "Hellas"
+  },
+  {
+    "image": "/assets/flags/hungary.png",
+    "name": "Ungarn"
+  },
+  {
+    "image": "/assets/flags/iceland.png",
+    "name": "Island"
+  },
+  {
+    "image": "/assets/flags/italy.png",
+    "name": "Italia"
+  },
+  {
+    "image": "/assets/flags/japan.png",
+    "name": "Japan"
+  },
+  {
+    "image": "/assets/flags/latvia.png",
+    "name": "Latvia"
+  },
+  {
+    "image": "/assets/flags/lithuania.png",
+    "name": "Litauen"
+  },
+  {
+    "image": "/assets/flags/netherlands.png",
+    "name": "Nederland"
+  },
+  {
+    "image": "/assets/flags/norway.png",
+    "name": "Norge"
+  },
+  {
+    "image": "/assets/flags/pakistan.png",
+    "name": "Pakistan"
+  },
+  {
+    "image": "/assets/flags/rumenia.png",
+    "name": "Romenia"
+  },
+  {
+    "image": "/assets/flags/russia.png",
+    "name": "Russland"
+  },
+  {
+    "image": "/assets/flags/serbia.png",
+    "name": "Serbia"
+  },
+  {
+    "image": "/assets/flags/spain.png",
+    "name": "Spania"
+  },
+  {
+    "image": "/assets/flags/sweden.png",
+    "name": "Sverige"
+  },
+  {
+    "image": "/assets/flags/uk.png",
+    "name": "Storbritannia"
+  },
+  {
+    "image": "/assets/flags/ukraine.png",
+    "name": "Ukraina"
+  }
+]

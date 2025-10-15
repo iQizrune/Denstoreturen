@@ -1,0 +1,22 @@
+// app/lib/progressBus.ts
+type Payload = { meters: number; ts?: number };
+type Listener = (d: Payload) => void;
+
+const subs = new Set<Listener>();
+
+export function publishMeters(meters: number) {
+  if (Number.isFinite(meters)) {
+    const d = { meters, ts: Date.now() };
+    subs.forEach((fn) => fn(d));
+  }
+}
+
+export function subscribeMeters(fn: Listener) {
+  subs.add(fn);
+  return () => { subs.delete(fn); }; // ikke returner boolean direkte
+}
+
+
+export default function __route_stub__() {
+  return null as any;
+}
