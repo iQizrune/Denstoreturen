@@ -1,5 +1,7 @@
 import { View, Text, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Link } from 'expo-router';
+
 
 export default function Results() {
   const { score } = useLocalSearchParams<{ score?: string }>();

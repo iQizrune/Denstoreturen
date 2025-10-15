@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { Link } from 'expo-router';
+
 
 export default function PlayScreen() {
   const [Panel, setPanel] = useState<any>(null);
@@ -12,5 +14,10 @@ export default function PlayScreen() {
     return () => { alive = false; };
   }, []);
   if (!Panel) return <View style={{ flex: 1 }} />;
-  return <Panel />;
+  return (
+  <>
+    <Panel />
+    <Link href="/home">Til hjem</Link>
+  </>
+);
 }
