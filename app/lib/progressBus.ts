@@ -17,7 +17,9 @@ export function subscribeMeters(fn: Listener) {
   return () => { subs.delete(fn); }; // ikke returner boolean direkte
 }
 
-
-export default function __route_stub__() {
-  return null as any;
+export function onMeters(fn: Listener) {
+  return subscribeMeters(fn);
 }
+
+
+
