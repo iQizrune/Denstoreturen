@@ -6,6 +6,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     let alive = true;
+    console.log('[phase] home: mount');
     import('@/src/features/profile/HomePhasePanel')
       .then((m: any) => { if (alive) setPanel(() => m.default || null); })
       .catch(() => {});

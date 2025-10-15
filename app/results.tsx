@@ -5,6 +5,7 @@ export default function Results() {
   const { score } = useLocalSearchParams<{ score?: string }>();
   const router = useRouter();
   const n = Number(score ?? 0);
+  console.log('[phase] results: mount');
   return (
     <View
       style={{
