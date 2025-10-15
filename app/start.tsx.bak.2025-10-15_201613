@@ -14,12 +14,7 @@ export default function StartScreen() {
         <Pressable style={{ backgroundColor: '#34d399', padding: 16, borderRadius: 12, alignItems: 'center' }}>
           <Text style={{ color: 'white', fontWeight: '700' }}>Start: Kunst</Text>
         </Pressable>
-      </Link>    <Link href="/kart" asChild>
-      <Text style={{ backgroundColor: '#111', color: '#60a5fa', textAlign: 'center', padding: 12, borderRadius: 10 }}>
-        Se kart (test)
-      </Text>
-    </Link>
-
+      </Link>
     </View>
   );
 }
