@@ -1,5 +1,5 @@
 import { POINTS_PER_CORRECT } from "@/src/config/game";
-import { publishMeters } from "@/app/lib/progressBus";
+import { publishMeters } from '@/src/lib/progressBus';
 
 type Phase = "intro" | "route" | "stop" | "pause" | "results";
 

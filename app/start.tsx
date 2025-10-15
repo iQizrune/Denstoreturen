@@ -1,25 +1,14 @@
 import React from 'react';
-import { View, Pressable, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { Link } from 'expo-router';
 
-export default function StartScreen() {
+export default function Start() {
   return (
-    <View style={{ flex: 1, justifyContent: 'flex-end', padding: 16, gap: 12, backgroundColor: '#111' }}>
-      <Link href="/play?cat=general" asChild>
-        <Pressable style={{ backgroundColor: '#60a5fa', padding: 16, borderRadius: 12, alignItems: 'center' }}>
-          <Text style={{ color: 'white', fontWeight: '700' }}>Start: General</Text>
-        </Pressable>
-      </Link>
-      <Link href="/play?cat=kunst" asChild>
-        <Pressable style={{ backgroundColor: '#34d399', padding: 16, borderRadius: 12, alignItems: 'center' }}>
-          <Text style={{ color: 'white', fontWeight: '700' }}>Start: Kunst</Text>
-        </Pressable>
-      </Link>    <Link href="/kart" asChild>
-      <Text style={{ backgroundColor: '#111', color: '#60a5fa', textAlign: 'center', padding: 12, borderRadius: 10 }}>
-        Se kart (test)
-      </Text>
-    </Link>
-
+    <View style={{ flex: 1, backgroundColor: '#111', padding: 24, gap: 12, justifyContent: 'center' }}>
+      <Text style={{ color: 'white', fontSize: 22, fontWeight: '700' }}>Start</Text>
+      <Link href="/play" style={{ color: '#60a5fa' }}>Spill (stub)</Link>
+      <Link href="/results" style={{ color: '#60a5fa' }}>Resultater (stub)</Link>
+      <Link href="/kart" style={{ color: '#60a5fa' }}>Se kart</Link>
     </View>
   );
 }
