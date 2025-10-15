@@ -1,12 +1,39 @@
 import React, { useState } from "react";
 import { View, Text, Pressable } from "react-native";
-import { BANK } from "../banks/local";
-import { POINTS_PER_CORRECT } from "../config/game";
 
 type Props = {
   onCorrect?: () => void;
   onWrong?: () => void;
 };
+
+type QA = {
+  q: string;
+  options: { key: string; label: string; isCorrect: boolean }[];
+};
+
+const BANK: QA[] = [
+  {
+    q: "Hvor mange meter vil du gå?",
+    options: [
+      { key: "A", label: "Ti meter", isCorrect: true },
+      { key: "B", label: "Null meter", isCorrect: false },
+    ],
+  },
+  {
+    q: "Velg riktig påstand:",
+    options: [
+      { key: "A", label: "Riktig (+10)", isCorrect: true },
+      { key: "B", label: "Feil (0)", isCorrect: false },
+    ],
+  },
+  {
+    q: "En til for å teste progresjon:",
+    options: [
+      { key: "A", label: "Gi poeng", isCorrect: true },
+      { key: "B", label: "Ingen poeng", isCorrect: false },
+    ],
+  },
+];
 
 export default function PlayingPanels({ onCorrect, onWrong }: Props) {
   const [idx, setIdx] = useState(0);
@@ -36,17 +63,11 @@ export default function PlayingPanels({ onCorrect, onWrong }: Props) {
     );
   }
 
-  const progress = ((idx) / BANK.length) * 100;
-
   return (
     <View style={{ padding: 16, gap: 12 }}>
       <Text style={{ fontSize: 18, fontWeight: "700" }}>
         Oppgave {idx + 1} av {BANK.length}
       </Text>
-      <View style={{ height: 8, backgroundColor: "#e5e7eb", borderRadius: 999 }}>
-        <View style={{ width: `${progress}%`, height: 8, backgroundColor: "#60a5fa", borderRadius: 999 }} />
-      </View>
-
       <Text>{qa.q}</Text>
 
       {qa.options.map((opt) => (
@@ -74,7 +95,7 @@ export default function PlayingPanels({ onCorrect, onWrong }: Props) {
       {answered && (
         <>
           <Text>
-            {answered === "correct" ? `Riktig! +${POINTS_PER_CORRECT} meter` : "Feil. 0 meter"}
+            {answered === "correct" ? "Riktig! +10 meter" : "Feil. 0 meter"}
           </Text>
           <Pressable
             onPress={next}

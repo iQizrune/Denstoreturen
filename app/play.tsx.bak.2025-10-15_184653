@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { POINTS_PER_CORRECT } from '@/src/config/game';
 import { View } from 'react-native';
 import { Link } from 'expo-router';
 import { Pressable, Text } from 'react-native';
@@ -26,8 +25,7 @@ useEffect(() => {
 
   useEffect(() => {
     let alive = true;
-        setAnswered(false);
-publishMeters(0);
+    publishMeters(0);
     console.log('[phase] play: mount');
     import('@/src/partials/PlayingPanels')
       .then((m: any) => { if (alive) setPanel(() => m.default || null); })
@@ -38,7 +36,7 @@ publishMeters(0);
 return (
   <>
     <Panel
-  onCorrect={() => { publishMeters(meters + POINTS_PER_CORRECT); setAnswered(true); setCorrect(c => c + 1); }}
+  onCorrect={() => { publishMeters(meters + 10); setAnswered(true); setCorrect(c => c + 1); }}
   onWrong={() => { publishMeters(meters); setAnswered(true); }}
 />
 
