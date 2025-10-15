@@ -1,6 +1,16 @@
 # Den store gåturen — Appbeskrivelse (teknisk)
 _Sist oppdatert: 2025-10-12 18:19 UTC_
 
+## Oppdatert 2025-10-15 11:03 — tverr-chat gyldighet
+- Prosjektrot er **`Denstoregåturen/`**.
+- Styringsfiler ligger i **`tilnychat/`** i prosjektroten.
+- `npm run guard` er **valgfritt og kommer senere**; ikke et krav for prosessen nå.
+- Dokumentet er gyldig uavhengig av chat-nummer (2, 10, …).
+- Alle stier bruker **Denstoregåturen/** som prosjektrot.
+- `tilnychat/` er fast mappe for styringsdokumenter og logger.
+- `guard`-skript nevnt i enkelte beskrivelser er **ikke påkrevd** per nå.
+
+
 > Formål: Dette dokumentet skal ligge i repoet og lastes opp i starten av hver ny chat for å sikre kontinuitet. Det beskriver **arkitekturvalg**, **moduler**, **datastrøm**, og **kontrakter** uten å være låst til en bestemt implementasjonsdetalj. Vi kan revidere det kontrollert over tid.
 
 ---
@@ -237,3 +247,35 @@ Alle spørsmål har **tidsbar** (grønn→rød); ved utløp: gå videre.
 ---
 
 **Status:** Dette dokumentet beskriver _valgene_ — ikke den endelige koden. Vi oppdaterer det når vi justerer regler, moduler eller filplasseringer.
+
+### Slik lagrer du terminal-output til logg (anbefalt)
+Kjør fra **Denstoregåturen/** når output er lang:
+```bash
+LOG="tilnychat/SETUP_LOG_$(date +%F_%H%M).txt"
+mkdir -p tilnychat
+echo "# Setup-logg $(date)" | tee "$LOG"
+
+( git rev-parse --show-toplevel || echo "ingen .git her" ) 2>&1 | tee -a "$LOG"
+git status 2>&1 | tee -a "$LOG"
+git log --oneline -n 10 2>&1 | tee -a "$LOG"
+git tag --list 2>&1 | tee -a "$LOG"
+
+ls -la | tee -a "$LOG"
+[ -f package.json ] && cat package.json | tee -a "$LOG"
+[ -f tsconfig.json ] && cat tsconfig.json | tee -a "$LOG"
+
+npx tsc --noEmit 2>&1 | tee -a "$LOG" || true
+```
+
+### Frys-rutine (tag)
+Standard liten frys etter milepæl (fra **Denstoregåturen/**):
+```bash
+git add -A
+git commit -m "docs: oppdatert dokument (2025-10-15 11:03)"
+git tag freeze/2025-10-15-milepæl
+```
+Rollback:
+```bash
+git tag -d freeze/2025-10-15-milepæl || true
+git reset --hard HEAD~1
+```

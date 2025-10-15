@@ -1,5 +1,15 @@
 
 # SAMARBEID – fast prosessmal for nye chatter
+
+## Oppdatert 2025-10-15 10:58 — tverr-chat gyldighet
+- Prosjektrot er **`Denstoregåturen/`**.
+- Styringsfiler ligger i **`tilnychat/`** i prosjektroten.
+- `npm run guard` er **valgfritt og kommer senere**; ikke et krav for prosessen nå.
+- Dokumentene er skrevet for å være **gyldige i hvilken som helst chat (#2, #10, …)**.
+- Alle stier og eksempler bruker **Denstoregåturen/** som prosjektrot.
+- `tilnychat/` er vår faste mappe for samarbeidsfiler, oppsummeringer og logger.
+- `guard`-skriptene nevnt tidligere er **ikke påkrevd**; vi etablerer dem senere ved behov.
+
 > Legg denne fila i `tilnychat/SAMARBEID.md` og last den opp i starten av **hver** ny chat.
 > Denne fila handler om **hvordan** vi jobber (ikke spillreglene – de ligger i egen SpillInfo-fil).
 
@@ -98,3 +108,37 @@ Bygg stops.ts fra routeData.ts:
 Beskrivelse: Leser midlertidig/routeData.ts → skriver src/data/stops.ts (navn + kumulative meter). Kryssjekker mot routeNodes.ts hvis tilstede.
 🧰 Feilrapportering
 Når noe feiler: lim inn feilmelding + fil + linje (kort), og hva som skjedde/ikke skjedde. Jeg svarer med en målrettet retting av gangen.
+
+### Slik lagrer du terminal‑output til logg (anbefalt)
+Bruk dette når output blir lang. Kjør fra **Denstoregåturen/**:
+```bash
+LOG="tilnychat/SETUP_LOG_$(date +%F_%H%M).txt"
+mkdir -p tilnychat
+echo "# Setup-logg $(date)" | tee "$LOG"
+
+# Eksempler (du kan legge til | tee -a "$LOG" på alt du vil logge)
+( git rev-parse --show-toplevel || echo "ingen .git her" ) 2>&1 | tee -a "$LOG"
+git status 2>&1 | tee -a "$LOG"
+git log --oneline -n 10 2>&1 | tee -a "$LOG"
+git tag --list 2>&1 | tee -a "$LOG"
+
+ls -la | tee -a "$LOG"
+[ -f package.json ] && cat package.json | tee -a "$LOG"
+[ -f tsconfig.json ] && cat tsconfig.json | tee -a "$LOG"
+
+# Valgfritt (hvis TypeScript er satt opp)
+npx tsc --noEmit 2>&1 | tee -a "$LOG" || true
+```
+
+### Frys‑rutine (tag)
+Standard liten frys etter milepæl (fra **Denstoregåturen/**):
+```bash
+git add -A
+git commit -m "docs: oppdatert samarbeids/oppdateringer (2025-10-15 10:58)"
+git tag freeze/2025-10-15-milepæl
+```
+Rollback av siste commit/tag:
+```bash
+git tag -d freeze/2025-10-15-milepæl || true
+git reset --hard HEAD~1
+```

@@ -1,6 +1,16 @@
 
 # OPPSUMMERING – Den store gåturen (prosjektstatus & retningslinjer for ny chat)
 
+## Oppdatert 2025-10-15 10:58 — tverr-chat gyldighet
+- Prosjektrot er **`Denstoregåturen/`**.
+- Styringsfiler ligger i **`tilnychat/`** i prosjektroten.
+- `npm run guard` er **valgfritt og kommer senere**; ikke et krav for prosessen nå.
+- Dokumentene er skrevet for å være **gyldige i hvilken som helst chat (#2, #10, …)**.
+- Alle stier og eksempler bruker **Denstoregåturen/** som prosjektrot.
+- `tilnychat/` er vår faste mappe for samarbeidsfiler, oppsummeringer og logger.
+- `guard`-skriptene nevnt tidligere er **ikke påkrevd**; vi etablerer dem senere ved behov.
+
+
 **Dato:** auto-generert oppsummering  
 **Formål:** Denne filen følger prosjektet mellom samtaler. Den gir rask innføring for en ny ChatGPT-session og beskriver hva som allerede er besluttet, hvor ting ligger, og hva som er «den røde tråden». **Ny chat skal forholde seg til denne filen** og ikke finne opp alternative løsninger uten eksplisitt avtale.
 
@@ -85,7 +95,7 @@
 ## 4. Teknologi og prosjektstruktur
 - **Expo + React Native + TypeScript.** Målplattform: **mobil (iOS/Android)**.  
 - **Expo Router** i bruk (app/ som rutestruktur).  
-- **AsyncStorage** for lokalt lager (avatar, mute, siste score, highscores lokal). Nøkler prefiks `app:` (migrering fra `iqiz:` finnes som *valgfri* engangsfunksjon).
+- **AsyncStorage** for lokalt lager (avatar, mute, siste score, highscores lokal). Nøkler prefiks `app:` (migrering fra `Denstoregåturen:` finnes som *valgfri* engangsfunksjon).
 - **Filstruktur (hoved):**
   - `app/` – skjermer (router), UI-spesifikke filer.
   - `components/` – gjenbrukbare komponenter (StopModule, plakater, UI).
@@ -171,3 +181,37 @@ G. **Kart:**
 ---
 
 *Dette dokumentet er levende. Oppdateres når vi tar nye beslutninger.*
+
+### Slik lagrer du terminal‑output til logg (anbefalt)
+Bruk dette når output blir lang. Kjør fra **Denstoregåturen/**:
+```bash
+LOG="tilnychat/SETUP_LOG_$(date +%F_%H%M).txt"
+mkdir -p tilnychat
+echo "# Setup-logg $(date)" | tee "$LOG"
+
+# Eksempler (du kan legge til | tee -a "$LOG" på alt du vil logge)
+( git rev-parse --show-toplevel || echo "ingen .git her" ) 2>&1 | tee -a "$LOG"
+git status 2>&1 | tee -a "$LOG"
+git log --oneline -n 10 2>&1 | tee -a "$LOG"
+git tag --list 2>&1 | tee -a "$LOG"
+
+ls -la | tee -a "$LOG"
+[ -f package.json ] && cat package.json | tee -a "$LOG"
+[ -f tsconfig.json ] && cat tsconfig.json | tee -a "$LOG"
+
+# Valgfritt (hvis TypeScript er satt opp)
+npx tsc --noEmit 2>&1 | tee -a "$LOG" || true
+```
+
+### Frys‑rutine (tag)
+Standard liten frys etter milepæl (fra **Denstoregåturen/**):
+```bash
+git add -A
+git commit -m "docs: oppdatert samarbeids/oppdateringer (2025-10-15 10:58)"
+git tag freeze/2025-10-15-milepæl
+```
+Rollback av siste commit/tag:
+```bash
+git tag -d freeze/2025-10-15-milepæl || true
+git reset --hard HEAD~1
+```

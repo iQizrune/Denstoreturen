@@ -1,6 +1,16 @@
 
 # Den store gåturen — Appbeskrivelse (ikke‑teknisk)
 
+## Oppdatert 2025-10-15 11:03 — tverr-chat gyldighet
+- Prosjektrot er **`Denstoregåturen/`**.
+- Styringsfiler ligger i **`tilnychat/`** i prosjektroten.
+- `npm run guard` er **valgfritt og kommer senere**; ikke et krav for prosessen nå.
+- Dokumentet er gyldig uavhengig av chat-nummer (2, 10, …).
+- Alle stier bruker **Denstoregåturen/** som prosjektrot.
+- `tilnychat/` er fast mappe for styringsdokumenter og logger.
+- `guard`-skript nevnt i enkelte beskrivelser er **ikke påkrevd** per nå.
+
+
 ## Hva er dette spillet?
 **Den store gåturen** er en mobilquiz der spilleren går en rute i Norge fra **Lindesnes fyr** til **Kirkenes**. Man beveger seg fremover ved å svare på spørsmål og tjener **meter** i stedet for poeng i hovedløypa. Underveis stopper man i byer/steder (stoppesteder) for egne by‑quizer og for å samle **byvåpen** og **hjelpemidler** i en **sekk**.
 
@@ -150,3 +160,35 @@ Plakatdesign er **konsekvent** i hele appen.
 
 ## Oppsummering
 **Den store gåturen** er en quizreise fra sør til nord i Norge. Riktig kunnskap gir **meter**, stoppestedene gir **byvåpen** og lokal læring. Spilleren må balansere tempo, nøyaktighet og strategi (utstyr, vær, hjelpemidler) for å nå målet raskest, med færrest restarter og færrest spørsmål. Hele opplevelsen er mobil‑først, med tydelig og gjenkjennelig design, korte instruksjoner og jevn fremdrift.
+
+### Slik lagrer du terminal-output til logg (anbefalt)
+Kjør fra **Denstoregåturen/** når output er lang:
+```bash
+LOG="tilnychat/SETUP_LOG_$(date +%F_%H%M).txt"
+mkdir -p tilnychat
+echo "# Setup-logg $(date)" | tee "$LOG"
+
+( git rev-parse --show-toplevel || echo "ingen .git her" ) 2>&1 | tee -a "$LOG"
+git status 2>&1 | tee -a "$LOG"
+git log --oneline -n 10 2>&1 | tee -a "$LOG"
+git tag --list 2>&1 | tee -a "$LOG"
+
+ls -la | tee -a "$LOG"
+[ -f package.json ] && cat package.json | tee -a "$LOG"
+[ -f tsconfig.json ] && cat tsconfig.json | tee -a "$LOG"
+
+npx tsc --noEmit 2>&1 | tee -a "$LOG" || true
+```
+
+### Frys-rutine (tag)
+Standard liten frys etter milepæl (fra **Denstoregåturen/**):
+```bash
+git add -A
+git commit -m "docs: oppdatert dokument (2025-10-15 11:03)"
+git tag freeze/2025-10-15-milepæl
+```
+Rollback:
+```bash
+git tag -d freeze/2025-10-15-milepæl || true
+git reset --hard HEAD~1
+```
