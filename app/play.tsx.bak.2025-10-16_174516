@@ -31,7 +31,26 @@ const keys = getBankKeys();
     return (
       <View style={{ flex: 1, backgroundColor: '#111', padding: 24 }}>
 
-      
+      {__DEV__ && (
+        <Pressable
+          testID="dev-jump-stop"
+          onPress={() => {
+            try {
+              const rs = getRouteState();
+              const cur = Number(getMetersSnapshot() ?? 0);
+              const target = Number(rs?.nextStopAtMeters ?? 0);
+              if (target > 0) {
+                const newMeters = Math.max(cur, Math.max(0, target - 100));
+                publishMeters(newMeters);
+                console.log('[dev] jump near stop', {cur, target, newMeters});
+              }
+            } catch {}
+          }}
+          style={{ backgroundColor:'#10b981', padding:10, borderRadius:10, marginBottom:10 }}
+        >
+          <Text style={{ color:'white', fontWeight:'800', textAlign:'center' }}>Hopp nær stopp (-100 m)</Text>
+        </Pressable>
+      )}
         <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>Ingen spørsmål i «{bankKey}»</Text>
         <Text style={{ color: '#9ca3af', marginTop: 6 }}>Kategorier: {keys.join(', ') || '(ingen)'}</Text>
         <Link href="/start" style={{ color: '#60a5fa', marginTop: 16 }}>Til start</Link>

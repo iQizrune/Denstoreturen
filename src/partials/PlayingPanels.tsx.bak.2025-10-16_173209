@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { BANKS } from "../banks/local";
-import { publishMeters, getMetersSnapshot } from '@/src/lib/progressBus';
-import { POINTS_PER_CORRECT } from '@/src/config/game';
 
 type QA = { q: string; a: string; choices: string[] };
 
@@ -12,24 +10,17 @@ export default function PlayingPanels() {
 
   const [i, setI] = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [showCats, setShowCats] = useState(false);
 
   const qa = qs[i];
   const total = qs.length;
 
   const pick = (label: string) => {
-  if (!qa) return;
+    if (!qa) return;
     const isOk = label === qa.a;
-    if (isOk) {
-      const cur = Number(getMetersSnapshot() ?? 0);
-      const next = cur + Number(POINTS_PER_CORRECT ?? 0);
-      publishMeters(next);
-      console.log('[meters] +', POINTS_PER_CORRECT, '=>', next);
-    }
     if (isOk) setCorrect((c) => c + 1);
     const nxt = i + 1;
     if (nxt < total) setI(nxt);
-};
+  };
 
   if (!total) {
     return (
@@ -37,29 +28,16 @@ export default function PlayingPanels() {
         <Text style={{ color: "white", fontWeight: "800", fontSize: 18, marginBottom: 12 }}>
           Ingen spørsmål i {String(cat)}
         </Text>
-        
-      <View style={{ gap: 8 }}>
-        <Pressable
-          onPress={() => setShowCats(v => !v)}
-          style={{ backgroundColor: "#e5e7eb", padding: 10, borderRadius: 10 }}
-        >
-          <Text>{showCats ? "Skjul kategorier" : "Vis kategorier"}</Text>
-        </Pressable>
-
-        {showCats && (
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            <Pressable onPress={() => { setCat("general"); setI(0); setCorrect(0); setShowCats(false); }}
-              style={{ backgroundColor: cat === "general" ? "#60a5fa" : "#e5e7eb", padding: 10, borderRadius: 10 }}>
-              <Text style={{ color: cat === "general" ? "white" : "black", fontWeight: "700" }}>general</Text>
-            </Pressable>
-            <Pressable onPress={() => { setCat("kunst"); setI(0); setCorrect(0); setShowCats(false); }}
-              style={{ backgroundColor: cat === "kunst" ? "#60a5fa" : "#e5e7eb", padding: 10, borderRadius: 10 }}>
-              <Text style={{ color: cat === "kunst" ? "white" : "black", fontWeight: "700" }}>kunst</Text>
-            </Pressable>
-          </View>
-        )}
-      </View>
-  
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable onPress={() => { setCat("general"); setI(0); setCorrect(0); }}
+            style={{ backgroundColor: "#e5e7eb", padding: 10, borderRadius: 10 }}>
+            <Text>general</Text>
+          </Pressable>
+          <Pressable onPress={() => { setCat("kunst"); setI(0); setCorrect(0); }}
+            style={{ backgroundColor: "#e5e7eb", padding: 10, borderRadius: 10 }}>
+            <Text>kunst</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }

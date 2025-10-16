@@ -1,0 +1,48 @@
+import { logEvent } from "../../src/dev/EventLog";
+// app/lib/progressBus.ts
+type Payload = { meters: number; ts?: number };
+type Listener = (d: Payload) => void;
+
+const subs = new Set<Listener>();
+
+export function publishMeters(meters: number) {
+  if (Number.isFinite(meters)) {
+    const d = { meters, ts: Date.now() };
+    subs.forEach((fn) => fn(d));
+  }
+}
+
+export function subscribeMeters(fn: Listener) {
+  subs.add(fn);
+  return () => { subs.delete(fn); }; // ikke returner boolean direkte
+}
+
+export function onMeters(fn: Listener) {
+  return subscribeMeters(fn);
+}
+
+
+
+
+}
+
+// --- meters snapshot (dev helper) ---
+let __metersSnapshot = 0;
+// Hook inn etter at modulen er lastet, slik at onMeters er initialisert
+setTimeout(() => {
+  try {
+    // onMeters skal være eksportert fra denne modulen
+    // @ts-ignore
+    if (typeof onMeters === 'function') {
+      // @ts-ignore
+      onMeters((d: any) => {
+        const m = Number((d && typeof d === 'object' && 'meters' in d) ? d.meters : d);
+        if (Number.isFinite(m)) __metersSnapshot = m;
+      });
+    }
+  } catch {}
+}, 0);
+
+export function getMetersSnapshot(): number {
+  return __metersSnapshot;
+}
