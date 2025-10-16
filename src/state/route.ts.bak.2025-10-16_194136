@@ -1,0 +1,15 @@
+// src/state/route.ts
+// Første etappe: Lindesnes fyr (0 m) -> Mandal (39_467 m)
+const FIRST_LEG_END = 39467;
+
+export function getNextStopId(): string { return "mandal"; }
+export function getNextStopAtMeters(): number { return FIRST_LEG_END; }
+
+export function getMetersToNextStop(totalMeters: number): number {
+  const left = FIRST_LEG_END - (Number(totalMeters) || 0);
+  return left > 0 ? left : 0;
+}
+
+export function isAtOrPastNextStop(totalMeters: number): boolean {
+  return (Number(totalMeters) || 0) >= FIRST_LEG_END;
+}

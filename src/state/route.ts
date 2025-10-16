@@ -1,39 +1,62 @@
-import { getTotalMeters } from '@/src/state/run';
-import { getStops, getStopByIndex, findNextStop, type Stop } from '@/src/data/stopsIndex';
+// src/state/route.ts
+export type Stop = { id: string; name: string; at: number };
 
-let nextIndex = 0;
-let stopSeenForCurrent = false;
+const STOPS: Stop[] = [
+  { id: 'lindesnes-fyr', name: 'Lindesnes fyr', at: 0 },
+  { id: 'mandal',        name: 'Mandal',        at: 39467 },
+];
 
-export function resetRoute() {
-  nextIndex = 0;
-  stopSeenForCurrent = false;
+let nextIndex = 1;
+let stopSeen = false;
+
+export function getStops(): Stop[] {
+  return STOPS.slice();
 }
 
-export function getRouteState() {
-  const total = getTotalMeters();
-  const { stop } = findNextStop(total, nextIndex);
-  const nextStopAtMeters = stop ? stop.at : Number.POSITIVE_INFINITY;
-  return { nextStopAtMeters, stopSeen: stopSeenForCurrent, nextIndex, stops: getStops() };
+export function getCurrentStop(): Stop {
+  return STOPS[nextIndex] ?? STOPS[STOPS.length - 1];
 }
 
-export function getCurrentStop(): Stop | null {
-  return getStopByIndex(nextIndex);
+export function getNextStopId(): string {
+  return getCurrentStop().id;
 }
 
-export function getCurrentStopId(): string | null {
-  const s = getCurrentStop(); return s ? s.id : null;
-}
-
-export function markStopSeen() {
-  stopSeenForCurrent = true;
-}
-
-export function advanceAfterStop() {
-  nextIndex += 1;
-  stopSeenForCurrent = false;
+export function getNextStopAtMeters(): number {
+  return getCurrentStop().at;
 }
 
 export function getCurrentLegTargetMeters(): number {
-  const { nextStopAtMeters } = getRouteState();
-  return nextStopAtMeters;
+  return getNextStopAtMeters();
+}
+
+export function isAtOrPastNextStop(totalMeters: number): boolean {
+  return (Number(totalMeters) || 0) >= getNextStopAtMeters();
+}
+
+export function getMetersToNextStop(totalMeters: number): number {
+  const left = getNextStopAtMeters() - (Number(totalMeters) || 0);
+  return left > 0 ? left : 0;
+}
+
+export function markStopSeen(): void {
+  stopSeen = true;
+}
+
+export function advanceAfterStop(): void {
+  stopSeen = false;
+  if (nextIndex < STOPS.length - 1) nextIndex += 1;
+}
+
+export function getRouteState(): {
+  nextStopAtMeters: number;
+  stopSeen: boolean;
+  nextIndex: number;
+  stops: Stop[];
+} {
+  return {
+    nextStopAtMeters: getNextStopAtMeters(),
+    stopSeen,
+    nextIndex,
+    stops: getStops(),
+  };
 }

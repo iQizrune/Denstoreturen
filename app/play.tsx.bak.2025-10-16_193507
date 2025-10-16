@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter, Link } from 'expo-router';
 import { publishMeters, getMetersSnapshot } from '@/src/lib/progressBus';
-import { getMetersToNextStop, isAtOrPastNextStop, getNextStopAtMeters } from '@/src/state/route';
+import { getRouteState } from '@/src/state/route';
 import { getBankKeys, loadBank, pickRound } from '@/src/banks/adapter';
 import { POINTS_PER_CORRECT } from '@/src/config/game';
 
@@ -11,9 +11,6 @@ type QA = { q: string; a: string; choices: string[] };
 
 export default function Play() {
   const router = useRouter();
-  const [meters, setMeters] = React.useState<number>(getMetersSnapshot());
-  const [left, setLeft] = React.useState<number>(getMetersToNextStop(getMetersSnapshot()));
-
   const { cat } = useLocalSearchParams<{ cat?: string }>();
 
   

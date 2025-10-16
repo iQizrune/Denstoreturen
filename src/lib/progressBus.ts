@@ -1,14 +1,16 @@
-type Payload = { meters: number; ts?: number };
+// src/lib/progressBus.ts
+export type Payload = { meters: number; ts?: number };
 type Listener = (d: Payload) => void;
 
 const subs = new Set<Listener>();
-let __metersSnapshot = 0;
+let lastMeters = 0;
 
 export function publishMeters(meters: number) {
-  if (!Number.isFinite(meters)) return;
-  __metersSnapshot = meters;
-  const d: Payload = { meters, ts: Date.now() };
-  subs.forEach(fn => fn(d));
+  if (Number.isFinite(meters)) {
+    lastMeters = meters;
+    const d = { meters, ts: Date.now() };
+    subs.forEach((fn) => fn(d));
+  }
 }
 
 export function subscribeMeters(fn: Listener) {
@@ -16,10 +18,8 @@ export function subscribeMeters(fn: Listener) {
   return () => { subs.delete(fn); };
 }
 
-export function onMeters(fn: Listener) {
-  return subscribeMeters(fn);
-}
+export const onMeters = subscribeMeters;
 
 export function getMetersSnapshot(): number {
-  return __metersSnapshot;
+  return Number.isFinite(lastMeters) ? lastMeters : 0;
 }

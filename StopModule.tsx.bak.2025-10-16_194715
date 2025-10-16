@@ -36,10 +36,7 @@ export default function StopModule({
   const pick = (optId: string) => {
     const q = quiz[i];
     if (!q) return;
-    {
-      const chosen = q.options?.find(o => o.id === optId);
-      if (chosen?.isCorrect) setCorrect(c => c + 1);
-    }
+    if (optId === q.correctId) setCorrect(c => c + 1);
     const nxt = i + 1;
     if (nxt < total) setI(nxt);
     else setPhase('done');
