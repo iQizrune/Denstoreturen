@@ -1,85 +1,105 @@
-import { isStopActive } from '@/src/engine/conductor';
-import React, { useMemo, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { useLocalSearchParams, useRouter, Link } from 'expo-router';
-import { publishMeters, getMetersSnapshot } from '@/src/lib/progressBus';
-import { getMetersToNextStop, isAtOrPastNextStop, getNextStopAtMeters } from '@/src/state/route';
-import { getBankKeys, loadBank, pickRound } from '@/src/banks/adapter';
-import { POINTS_PER_CORRECT } from '@/src/config/game';
+import React, { useEffect, useState } from 'react';
+import { View, Pressable, Text } from 'react-native';
+import { getStops } from '@/src/state/route';
+import { getMetersSnapshot, publishMeters, subscribeMeters } from '@/src/lib/progressBus';
 
-type QA = { q: string; a: string; choices: string[] };
+type Stop = { id: string; name: string; at: number };
 
-export default function Play() {
-  const router = useRouter();
-  const [meters, setMeters] = React.useState<number>(getMetersSnapshot());
-  const [left, setLeft] = React.useState<number>(getMetersToNextStop(getMetersSnapshot()));
-
-  const { cat } = useLocalSearchParams<{ cat?: string }>();
-
-  
-  if (isStopActive()) { router.replace('/stop'); return <View style={{flex:1,backgroundColor:'#111'}} />; }
-
-const keys = getBankKeys();
-  const requested = (cat as string) || (keys[0] ?? 'general');
-  const bankKey = keys.includes(requested) ? requested : (keys[0] ?? 'general');
-
-  const bank = useMemo<QA[]>(() => loadBank(bankKey), [bankKey]);
-  const round = useMemo<QA[]>(() => pickRound(bank, 5), [bankKey, bank.length]);
-
-  const [idx, setIdx] = useState(0);
-  const [correct, setCorrect] = useState(0);
-  const total = round.length;
-
-  if (total === 0) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#111', padding: 24 }}>
-
-      
-        <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>Ingen spørsmål i «{bankKey}»</Text>
-        <Text style={{ color: '#9ca3af', marginTop: 6 }}>Kategorier: {keys.join(', ') || '(ingen)'}</Text>
-        <Link href="/start" style={{ color: '#60a5fa', marginTop: 16 }}>Til start</Link>
-      </View>
-    );
+function findNextStopLocal(total: number, stops: Stop[]) {
+  for (let i = 0; i < stops.length; i++) {
+    if (total < stops[i].at) return stops[i];
   }
+  return null;
+}
 
-  const q = round[idx];
+export default function PlayScreen() {
+  const [Panel, setPanel] = useState<any>(null);
+  const [meters, setMeters] = useState<number>(getMetersSnapshot());
+  const [next, setNext] = useState<Stop | null>(null);
 
-  const onAnswer = (choice: string) => {
-    const good = choice === q.a;
-    if (good) setCorrect((c) => c + 1);
-    const next = idx + 1;
-    if (next < total) {
-      setIdx(next);
-    } else {
-      const finalCorrect = good ? correct + 1 : correct;
-      const meters = finalCorrect * POINTS_PER_CORRECT;
-      router.replace(`/results?correct=${finalCorrect}&total=${total}&cat=${bankKey}&meters=${meters}`);
+  useEffect(() => {
+    let alive = true;
+    import('@/src/partials/PlayingPanels')
+      .then((m: any) => { if (alive) setPanel(() => m.default || null); })
+      .catch(() => {});
+    const unsub = subscribeMeters(({ meters: m }) => {
+      setMeters(m);
+      const s = getStops() as Stop[];
+      setNext(findNextStopLocal(m, s));
+    });
+    // første kalkulasjon:
+    const s = getStops() as Stop[];
+    setNext(findNextStopLocal(getMetersSnapshot(), s));
+
+    return () => { alive = false; unsub?.(); };
+  }, []);
+
+  const devJump = () => {
+    const total = getMetersSnapshot();
+    const s = getStops() as Stop[];
+    const nxt = findNextStopLocal(total, s);
+    if (!nxt) return;
+    const target = Math.max(0, nxt.at - 100);
+    if (total < target) {
+      console.log('[dev] jump to', target);
+      publishMeters(target);
     }
   };
 
+  if (!Panel) return <View style={{ flex:1, backgroundColor:'#111' }} />;
+
+  const remaining = next ? Math.max(0, next.at - meters) : 0;
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#111', padding: 24, gap: 16, justifyContent: 'center' }}>
-      <Text style={{ color: '#9ca3af' }}>Velg kategori:</Text>
-      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        {keys.map(k => (
-          <Pressable key={k} onPress={() => router.replace(`/play?cat=${k}`)}
-            style={{ backgroundColor: k===bankKey ? '#60a5fa' : '#e5e7eb', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999 }}>
-            <Text style={{ color: k===bankKey ? 'white' : 'black', fontWeight: '700' }}>{k}</Text>
-          </Pressable>
-        ))}
+    <View style={{ flex:1, backgroundColor:'#111' }}>
+      {/* HUD */}
+      <View
+        style={{
+          position:'absolute',
+          top:40,
+          left:16,
+          right:16,
+          zIndex: 9999,
+          elevation: 50,
+          backgroundColor:'rgba(17,17,17,0.8)',
+          borderRadius:12,
+          padding:10,
+          borderWidth:1,
+          borderColor:'#333'
+        }}
+        pointerEvents="none"
+      >
+        <Text style={{ color:'#fff', fontWeight:'800', textAlign:'center' }}>
+          {meters} m {next ? `• ${next.name} om ${remaining} m` : ''}
+        </Text>
       </View>
 
-      <Text style={{ color: '#60a5fa', fontWeight: '700' }}>{bankKey.toUpperCase()}</Text>
-      <Text style={{ color: 'white', fontSize: 20, fontWeight: '700' }}>{q.q}</Text>
-      <View style={{ gap: 10 }}>
-        {q.choices.map((c) => (
-          <Pressable key={c} onPress={() => onAnswer(c)} style={{ backgroundColor: '#e5e7eb', padding: 14, borderRadius: 12 }}>
-            <Text>{c}</Text>
-          </Pressable>
-        ))}
+      {/* Spørspanel under */}
+      <View style={{ flex:1 }}>
+        <Panel />
       </View>
-      <Text style={{ color: '#bbb' }}>{idx + 1} / {total}</Text>
-      <Link href="/start" style={{ color: '#60a5fa' }}>Avbryt</Link>
+
+      {/* Dev-knapp på topp av z-stack */}
+      <Pressable
+        onPress={devJump}
+        accessibilityRole="button"
+        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+        style={{
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: 96,          // løftet litt ekstra
+          backgroundColor: '#374151',
+          padding: 16,
+          borderRadius: 14,
+          zIndex: 10000,
+          elevation: 60
+        }}
+      >
+        <Text style={{ color:'white', fontWeight:'800', textAlign:'center' }}>
+          Dev: hopp til 100 m før neste stopp
+        </Text>
+      </Pressable>
     </View>
   );
 }

@@ -1,0 +1,904 @@
+=== FILE LIST: app/kart* ===
+9:-rw-r--r--@  1 runeandersen  staff  1450 Oct 15 21:42 kart.android.tsx
+10:-rw-r--r--@  1 runeandersen  staff  1446 Oct 15 21:42 kart.ios.tsx
+11:-rw-r--r--@  1 runeandersen  staff  1872 Oct 16 12:37 kart.native.tsx
+12:-rw-r--r--@  1 runeandersen  staff  3967 Oct 17 14:52 kart.tsx
+13:-rw-r--r--@  1 runeandersen  staff  5074 Oct 17 10:32 kart.tsx.bak_20251017-103237
+14:-rw-r--r--@  1 runeandersen  staff   602 Oct 15 21:26 kart.web.tsx
+
+=== PLATFORM VARIANTER ===
+app/kart.native.tsx:1:import React, { useMemo } from 'react';
+app/kart.native.tsx:2:import { View } from 'react-native';
+app/kart.native.tsx:3:import MapView, { Marker, Polyline } from 'react-native-maps';
+app/kart.native.tsx:4:import { getTotalMeters } from '@/src/state/run';
+app/kart.native.tsx:5:import { getCurrentLegTargetMeters } from '@/src/state/route';
+app/kart.native.tsx:6:import { Link } from 'expo-router';
+app/kart.native.tsx:7:
+app/kart.native.tsx:8:const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.native.tsx:9:const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.native.tsx:10:
+app/kart.native.tsx:11:function clamp01(x: number) { return Math.max(0, Math.min(1, x)); }
+app/kart.native.tsx:12:
+app/kart.native.tsx:13:export default function KartScreen() {
+app/kart.native.tsx:14:  const total = getTotalMeters();
+app/kart.native.tsx:15:  const target = getCurrentLegTargetMeters();
+app/kart.native.tsx:16:  const f = useMemo(() => clamp01(target > 0 ? total / target : 0), [total, target]);
+app/kart.native.tsx:17:
+app/kart.native.tsx:18:  const you = useMemo(() => ({
+app/kart.native.tsx:19:    latitude: oslo.latitude + (lillehammer.latitude - oslo.latitude) * f,
+app/kart.native.tsx:20:    longitude: oslo.longitude + (lillehammer.longitude - oslo.longitude) * f,
+app/kart.native.tsx:21:  }), [f]);
+app/kart.native.tsx:22:
+app/kart.native.tsx:23:  const initialRegion = useMemo(() => ({
+app/kart.native.tsx:24:    latitude: (oslo.latitude + lillehammer.latitude) / 2,
+app/kart.native.tsx:25:    longitude: (oslo.longitude + lillehammer.longitude) / 2,
+app/kart.native.tsx:26:    latitudeDelta: Math.abs(lillehammer.latitude - oslo.latitude) * 2,
+app/kart.native.tsx:27:    longitudeDelta: Math.abs(lillehammer.longitude - oslo.longitude) * 2,
+app/kart.native.tsx:28:  }), []);
+app/kart.native.tsx:29:
+app/kart.native.tsx:30:  return (
+app/kart.native.tsx:31:    <View style={{ flex: 1 }}>
+app/kart.native.tsx:32:      <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
+app/kart.native.tsx:33:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.native.tsx:34:        <Marker coordinate={lillehammer} title="Stopp 1" description="Lillehammer" />
+app/kart.native.tsx:35:        <Polyline coordinates={[oslo, lillehammer]} />
+app/kart.native.tsx:36:        <Marker coordinate={you} title="Du er her" />
+app/kart.native.tsx:37:      </MapView>
+app/kart.native.tsx:38:      <View style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
+app/kart.native.tsx:39:        <Link href="/start" style={{ backgroundColor: '#60a5fa', color: 'white', padding: 14, borderRadius: 12, textAlign: 'center' }}>
+app/kart.native.tsx:40:          Til start
+app/kart.native.tsx:41:        </Link>
+app/kart.native.tsx:42:      </View>
+app/kart.native.tsx:43:    </View>
+app/kart.native.tsx:44:  );
+app/kart.native.tsx:45:}
+app/kart.web.tsx:1:import React from 'react';
+app/kart.web.tsx:2:import { View, Text } from 'react-native';
+app/kart.web.tsx:3:import { Link } from 'expo-router';
+app/kart.web.tsx:4:
+app/kart.web.tsx:5:export default function KartWeb() {
+app/kart.web.tsx:6:  return (
+app/kart.web.tsx:7:    <View style={{ flex: 1, padding: 16, backgroundColor: '#111', gap: 12, justifyContent: 'center' }}>
+app/kart.web.tsx:8:      <Text style={{ color: 'white', fontSize: 18, fontWeight: '700' }}>Kart-test</Text>
+app/kart.web.tsx:9:      <Text style={{ color: '#ccc' }}>
+app/kart.web.tsx:10:        Kartet vises kun på mobil i denne røyk-testen. Åpne appen i Expo Go og gå til /kart.
+app/kart.web.tsx:11:      </Text>
+app/kart.web.tsx:12:      <Link href="/start" style={{ color: '#60a5fa', marginTop: 8 }}>Til start</Link>
+app/kart.web.tsx:13:    </View>
+app/kart.web.tsx:14:  );
+app/kart.web.tsx:15:}
+app/kart.tsx.bak_20251017-103237:1:import React, { useMemo, useRef } from "react";
+app/kart.tsx.bak_20251017-103237:2:import { Platform, View, Text, TouchableOpacity } from "react-native";
+app/kart.tsx.bak_20251017-103237:3:import MapView, { Marker, Polyline } from "react-native-maps";
+app/kart.tsx.bak_20251017-103237:4:import { useRouter } from "expo-router";
+app/kart.tsx.bak_20251017-103237:5:
+app/kart.tsx.bak_20251017-103237:6:import * as RouteNodes from "@/src/data/routeNodes";
+app/kart.tsx.bak_20251017-103237:7:import * as Stops from "@/src/data/stops";
+app/kart.tsx.bak_20251017-103237:8:
+app/kart.tsx.bak_20251017-103237:9:type LatLng = { latitude: number; longitude: number };
+app/kart.tsx.bak_20251017-103237:10:type Stop = { name?: string; title?: string; lat: number; lng: number };
+app/kart.tsx.bak_20251017-103237:11:
+app/kart.tsx.bak_20251017-103237:12:function coerceRouteNodes(mod: any): LatLng[] {
+app/kart.tsx.bak_20251017-103237:13:  const arr = (mod && (mod.ROUTE_NODES || mod.default || mod.nodes)) || [];
+app/kart.tsx.bak_20251017-103237:14:  return (arr as any[]).map((p) =>
+app/kart.tsx.bak_20251017-103237:15:    "latitude" in p && "longitude" in p
+app/kart.tsx.bak_20251017-103237:16:      ? { latitude: Number(p.latitude), longitude: Number(p.longitude) }
+app/kart.tsx.bak_20251017-103237:17:      : { latitude: Number((p as any).lat), longitude: Number((p as any).lng) }
+app/kart.tsx.bak_20251017-103237:18:  );
+app/kart.tsx.bak_20251017-103237:19:}
+app/kart.tsx.bak_20251017-103237:20:
+app/kart.tsx.bak_20251017-103237:21:function coerceStops(mod: any): Stop[] {
+app/kart.tsx.bak_20251017-103237:22:  const arr = (mod && (mod.STOPS || mod.default || mod.stops)) || [];
+app/kart.tsx.bak_20251017-103237:23:  return (arr as any[]).map((s) => ({
+app/kart.tsx.bak_20251017-103237:24:    name: (s as any).name ?? (s as any).title,
+app/kart.tsx.bak_20251017-103237:25:    title: (s as any).title ?? (s as any).name,
+app/kart.tsx.bak_20251017-103237:26:    lat: Number((s as any).lat),
+app/kart.tsx.bak_20251017-103237:27:    lng: Number((s as any).lng),
+app/kart.tsx.bak_20251017-103237:28:  }));
+app/kart.tsx.bak_20251017-103237:29:}
+app/kart.tsx.bak_20251017-103237:30:
+app/kart.tsx.bak_20251017-103237:31:function computeRegionFromNodes(nodes: LatLng[]) {
+app/kart.tsx.bak_20251017-103237:32:  if (!nodes.length) {
+app/kart.tsx.bak_20251017-103237:33:    return {
+app/kart.tsx.bak_20251017-103237:34:      latitude: 65.0,
+app/kart.tsx.bak_20251017-103237:35:      longitude: 13.0,
+app/kart.tsx.bak_20251017-103237:36:      latitudeDelta: 18,
+app/kart.tsx.bak_20251017-103237:37:      longitudeDelta: 12,
+app/kart.tsx.bak_20251017-103237:38:    };
+app/kart.tsx.bak_20251017-103237:39:  }
+app/kart.tsx.bak_20251017-103237:40:  const lats = nodes.map((n) => n.latitude);
+app/kart.tsx.bak_20251017-103237:41:  const lngs = nodes.map((n) => n.longitude);
+app/kart.tsx.bak_20251017-103237:42:  const minLat = Math.min(...lats);
+app/kart.tsx.bak_20251017-103237:43:  const maxLat = Math.max(...lats);
+app/kart.tsx.bak_20251017-103237:44:  const minLng = Math.min(...lngs);
+app/kart.tsx.bak_20251017-103237:45:  const maxLng = Math.max(...lngs);
+app/kart.tsx.bak_20251017-103237:46:  const latitude = (minLat + maxLat) / 2;
+app/kart.tsx.bak_20251017-103237:47:  const longitude = (minLng + maxLng) / 2;
+app/kart.tsx.bak_20251017-103237:48:  const latitudeDelta = Math.max(0.2, (maxLat - minLat) * 1.3);
+app/kart.tsx.bak_20251017-103237:49:  const longitudeDelta = Math.max(0.2, (maxLng - minLng) * 1.3);
+app/kart.tsx.bak_20251017-103237:50:  return { latitude, longitude, latitudeDelta, longitudeDelta };
+app/kart.tsx.bak_20251017-103237:51:}
+app/kart.tsx.bak_20251017-103237:52:
+app/kart.tsx.bak_20251017-103237:53:export default function Kart() {
+app/kart.tsx.bak_20251017-103237:54:  const router = useRouter();
+app/kart.tsx.bak_20251017-103237:55:
+app/kart.tsx.bak_20251017-103237:56:  if (Platform.OS === "web") {
+app/kart.tsx.bak_20251017-103237:57:    const stops = coerceStops(Stops);
+app/kart.tsx.bak_20251017-103237:58:    return (
+app/kart.tsx.bak_20251017-103237:59:      <View
+app/kart.tsx.bak_20251017-103237:60:        style={{
+app/kart.tsx.bak_20251017-103237:61:          flex: 1,
+app/kart.tsx.bak_20251017-103237:62:          backgroundColor: "#0b0b0f",
+app/kart.tsx.bak_20251017-103237:63:          padding: 16,
+app/kart.tsx.bak_20251017-103237:64:          gap: 12,
+app/kart.tsx.bak_20251017-103237:65:        }}
+app/kart.tsx.bak_20251017-103237:66:      >
+app/kart.tsx.bak_20251017-103237:67:        <Text style={{ color: "#fff", fontSize: 20, fontWeight: "600" }}>
+app/kart.tsx.bak_20251017-103237:68:          Kart (web-visning)
+app/kart.tsx.bak_20251017-103237:69:        </Text>
+app/kart.tsx.bak_20251017-103237:70:        <Text style={{ color: "#cfd3dc" }}>
+app/kart.tsx.bak_20251017-103237:71:          Denne visningen viser ikke et interaktivt kart på web. Åpne på mobil
+app/kart.tsx.bak_20251017-103237:72:          for polyline + markører.
+app/kart.tsx.bak_20251017-103237:73:        </Text>
+app/kart.tsx.bak_20251017-103237:74:        <Text style={{ color: "#cfd3dc" }}>
+app/kart.tsx.bak_20251017-103237:75:          Antall stopp i data: {stops.length || "ukjent"}
+app/kart.tsx.bak_20251017-103237:76:        </Text>
+app/kart.tsx.bak_20251017-103237:77:        <TouchableOpacity onPress={() => router.replace("/start")}>
+app/kart.tsx.bak_20251017-103237:78:          <Text style={{ color: "#9ad", fontSize: 16 }}>Til start</Text>
+app/kart.tsx.bak_20251017-103237:79:        </TouchableOpacity>
+app/kart.tsx.bak_20251017-103237:80:      </View>
+app/kart.tsx.bak_20251017-103237:81:    );
+app/kart.tsx.bak_20251017-103237:82:  }
+app/kart.tsx.bak_20251017-103237:83:
+app/kart.tsx.bak_20251017-103237:84:  const nodes = useMemo(() => coerceRouteNodes(RouteNodes), []);
+app/kart.tsx.bak_20251017-103237:85:  const stops = useMemo(() => coerceStops(Stops), []);
+app/kart.tsx.bak_20251017-103237:86:  const initialRegion = useMemo(() => computeRegionFromNodes(nodes), [nodes]);
+app/kart.tsx.bak_20251017-103237:87:  const mapRef = useRef<MapView | null>(null);
+app/kart.tsx.bak_20251017-103237:88:
+app/kart.tsx.bak_20251017-103237:89:  const fitAll = () => {
+app/kart.tsx.bak_20251017-103237:90:    if (!mapRef.current) return;
+app/kart.tsx.bak_20251017-103237:91:    const coords: LatLng[] = nodes.length
+app/kart.tsx.bak_20251017-103237:92:      ? nodes
+app/kart.tsx.bak_20251017-103237:93:      : stops.map((s) => ({ latitude: s.lat, longitude: s.lng }));
+app/kart.tsx.bak_20251017-103237:94:    if (!coords.length) return;
+app/kart.tsx.bak_20251017-103237:95:    mapRef.current.fitToCoordinates(coords, {
+app/kart.tsx.bak_20251017-103237:96:      edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
+app/kart.tsx.bak_20251017-103237:97:      animated: true,
+app/kart.tsx.bak_20251017-103237:98:    });
+app/kart.tsx.bak_20251017-103237:99:  };
+app/kart.tsx.bak_20251017-103237:100:
+app/kart.tsx.bak_20251017-103237:101:  return (
+app/kart.tsx.bak_20251017-103237:102:    <View style={{ flex: 1, backgroundColor: "#000" }}>
+app/kart.tsx.bak_20251017-103237:103:      <MapView
+app/kart.tsx.bak_20251017-103237:104:        ref={mapRef}
+app/kart.tsx.bak_20251017-103237:105:        style={{ flex: 1 }}
+app/kart.tsx.bak_20251017-103237:106:        initialRegion={initialRegion}
+app/kart.tsx.bak_20251017-103237:107:        onMapReady={fitAll}
+app/kart.tsx.bak_20251017-103237:108:      >
+app/kart.tsx.bak_20251017-103237:109:        {nodes.length > 0 && (
+app/kart.tsx.bak_20251017-103237:110:          <Polyline
+app/kart.tsx.bak_20251017-103237:111:            coordinates={nodes}
+app/kart.tsx.bak_20251017-103237:112:            strokeWidth={4}
+app/kart.tsx.bak_20251017-103237:113:          />
+app/kart.tsx.bak_20251017-103237:114:        )}
+app/kart.tsx.bak_20251017-103237:115:        {stops.map((s, idx) => (
+app/kart.tsx.bak_20251017-103237:116:          <Marker
+app/kart.tsx.bak_20251017-103237:117:            key={`${s.name ?? s.title ?? "stop"}-${idx}`}
+app/kart.tsx.bak_20251017-103237:118:            coordinate={{ latitude: s.lat, longitude: s.lng }}
+app/kart.tsx.bak_20251017-103237:119:            title={s.title ?? s.name ?? `Stopp ${idx + 1}`}
+app/kart.tsx.bak_20251017-103237:120:            description={s.name ?? s.title}
+app/kart.tsx.bak_20251017-103237:121:          />
+app/kart.tsx.bak_20251017-103237:122:        ))}
+app/kart.tsx.bak_20251017-103237:123:      </MapView>
+app/kart.tsx.bak_20251017-103237:124:
+app/kart.tsx.bak_20251017-103237:125:      <View
+app/kart.tsx.bak_20251017-103237:126:        pointerEvents="box-none"
+app/kart.tsx.bak_20251017-103237:127:        style={{
+app/kart.tsx.bak_20251017-103237:128:          position: "absolute",
+app/kart.tsx.bak_20251017-103237:129:          top: 20,
+app/kart.tsx.bak_20251017-103237:130:          right: 16,
+app/kart.tsx.bak_20251017-103237:131:          left: 16,
+app/kart.tsx.bak_20251017-103237:132:          gap: 10,
+app/kart.tsx.bak_20251017-103237:133:        }}
+app/kart.tsx.bak_20251017-103237:134:      >
+app/kart.tsx.bak_20251017-103237:135:        <View
+app/kart.tsx.bak_20251017-103237:136:          style={{
+app/kart.tsx.bak_20251017-103237:137:            alignSelf: "flex-end",
+app/kart.tsx.bak_20251017-103237:138:            backgroundColor: "rgba(0,0,0,0.5)",
+app/kart.tsx.bak_20251017-103237:139:            paddingVertical: 8,
+app/kart.tsx.bak_20251017-103237:140:            paddingHorizontal: 12,
+app/kart.tsx.bak_20251017-103237:141:            borderRadius: 12,
+app/kart.tsx.bak_20251017-103237:142:          }}
+app/kart.tsx.bak_20251017-103237:143:        >
+app/kart.tsx.bak_20251017-103237:144:          <TouchableOpacity onPress={fitAll}>
+app/kart.tsx.bak_20251017-103237:145:            <Text style={{ color: "#fff", fontSize: 14 }}>Tilpass utsnitt</Text>
+app/kart.tsx.bak_20251017-103237:146:          </TouchableOpacity>
+app/kart.tsx.bak_20251017-103237:147:        </View>
+app/kart.tsx.bak_20251017-103237:148:
+app/kart.tsx.bak_20251017-103237:149:        <View
+app/kart.tsx.bak_20251017-103237:150:          style={{
+app/kart.tsx.bak_20251017-103237:151:            alignSelf: "flex-start",
+app/kart.tsx.bak_20251017-103237:152:            backgroundColor: "rgba(0,0,0,0.5)",
+app/kart.tsx.bak_20251017-103237:153:            paddingVertical: 8,
+app/kart.tsx.bak_20251017-103237:154:            paddingHorizontal: 12,
+app/kart.tsx.bak_20251017-103237:155:            borderRadius: 12,
+app/kart.tsx.bak_20251017-103237:156:          }}
+app/kart.tsx.bak_20251017-103237:157:        >
+app/kart.tsx.bak_20251017-103237:158:          <TouchableOpacity onPress={() => router.replace("/start")}>
+app/kart.tsx.bak_20251017-103237:159:            <Text style={{ color: "#fff", fontSize: 14 }}>Til start</Text>
+app/kart.tsx.bak_20251017-103237:160:          </TouchableOpacity>
+app/kart.tsx.bak_20251017-103237:161:        </View>
+app/kart.tsx.bak_20251017-103237:162:      </View>
+app/kart.tsx.bak_20251017-103237:163:    </View>
+app/kart.tsx.bak_20251017-103237:164:  );
+app/kart.tsx.bak_20251017-103237:165:}
+app/kart.android.tsx:1:import React, { useEffect, useRef } from 'react';
+app/kart.android.tsx:2:import { View } from 'react-native';
+app/kart.android.tsx:3:import { Link } from 'expo-router';
+app/kart.android.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.android.tsx:5:
+app/kart.android.tsx:6:export default function KartAndroid() {
+app/kart.android.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.android.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.android.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.android.tsx:10:  const mapRef = useRef<MapView>(null);
+app/kart.android.tsx:11:
+app/kart.android.tsx:12:  useEffect(() => {
+app/kart.android.tsx:13:    const t = setTimeout(() => {
+app/kart.android.tsx:14:      mapRef.current?.fitToCoordinates(route, {
+app/kart.android.tsx:15:        edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
+app/kart.android.tsx:16:        animated: true,
+app/kart.android.tsx:17:      });
+app/kart.android.tsx:18:    }, 300);
+app/kart.android.tsx:19:    return () => clearTimeout(t);
+app/kart.android.tsx:20:  }, []);
+app/kart.android.tsx:21:
+app/kart.android.tsx:22:  return (
+app/kart.android.tsx:23:    <View style={{ flex: 1 }}>
+app/kart.android.tsx:24:      <MapView ref={mapRef} style={{ flex: 1 }} provider={PROVIDER_DEFAULT}
+app/kart.android.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.android.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.android.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+app/kart.android.tsx:28:        <Polyline coordinates={route} />
+app/kart.android.tsx:29:      </MapView>
+app/kart.android.tsx:30:      <View style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
+app/kart.android.tsx:31:        <Link href="/start" style={{ backgroundColor: '#60a5fa', color: 'white', padding: 14, borderRadius: 12, textAlign: 'center' }}>Til start</Link>
+app/kart.android.tsx:32:      </View>
+app/kart.android.tsx:33:    </View>
+app/kart.android.tsx:34:  );
+app/kart.android.tsx:35:}
+app/kart.ios.tsx:1:import React, { useEffect, useRef } from 'react';
+app/kart.ios.tsx:2:import { View } from 'react-native';
+app/kart.ios.tsx:3:import { Link } from 'expo-router';
+app/kart.ios.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.ios.tsx:5:
+app/kart.ios.tsx:6:export default function KartIOS() {
+app/kart.ios.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.ios.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.ios.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.ios.tsx:10:  const mapRef = useRef<MapView>(null);
+app/kart.ios.tsx:11:
+app/kart.ios.tsx:12:  useEffect(() => {
+app/kart.ios.tsx:13:    const t = setTimeout(() => {
+app/kart.ios.tsx:14:      mapRef.current?.fitToCoordinates(route, {
+app/kart.ios.tsx:15:        edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
+app/kart.ios.tsx:16:        animated: true,
+app/kart.ios.tsx:17:      });
+app/kart.ios.tsx:18:    }, 300);
+app/kart.ios.tsx:19:    return () => clearTimeout(t);
+app/kart.ios.tsx:20:  }, []);
+app/kart.ios.tsx:21:
+app/kart.ios.tsx:22:  return (
+app/kart.ios.tsx:23:    <View style={{ flex: 1 }}>
+app/kart.ios.tsx:24:      <MapView ref={mapRef} style={{ flex: 1 }} provider={PROVIDER_DEFAULT}
+app/kart.ios.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.ios.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.ios.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+app/kart.ios.tsx:28:        <Polyline coordinates={route} />
+app/kart.ios.tsx:29:      </MapView>
+app/kart.ios.tsx:30:      <View style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
+app/kart.ios.tsx:31:        <Link href="/start" style={{ backgroundColor: '#60a5fa', color: 'white', padding: 14, borderRadius: 12, textAlign: 'center' }}>Til start</Link>
+app/kart.ios.tsx:32:      </View>
+app/kart.ios.tsx:33:    </View>
+app/kart.ios.tsx:34:  );
+app/kart.ios.tsx:35:}
+app/kart.tsx:1:import React, { useMemo, useRef } from "react";
+app/kart.tsx:2:import { Platform, View, Text, TouchableOpacity } from "react-native";
+app/kart.tsx:3:import MapView, { Marker, Polyline } from "react-native-maps";
+app/kart.tsx:4:import { useRouter } from "expo-router";
+app/kart.tsx:5:
+app/kart.tsx:6:import * as Stops from "@/src/data/stops";
+app/kart.tsx:7:
+app/kart.tsx:8:type LatLng = { latitude: number; longitude: number };
+app/kart.tsx:9:type Stop = { name?: string; title?: string; lat: number; lng: number };
+app/kart.tsx:10:
+app/kart.tsx:11:function coerceStops(mod: any): Stop[] {
+app/kart.tsx:12:  const arr = (mod && (mod.STOPS || mod.default || mod.stops)) || [];
+app/kart.tsx:13:  return (arr as any[]).map((s: any) => ({
+app/kart.tsx:14:    name: s.name ?? s.title,
+app/kart.tsx:15:    title: s.title ?? s.name,
+app/kart.tsx:16:    lat: Number(s.lat),
+app/kart.tsx:17:    lng: Number(s.lng),
+app/kart.tsx:18:  }));
+app/kart.tsx:19:}
+app/kart.tsx:20:
+app/kart.tsx:21:function regionFromCoords(coords: LatLng[]) {
+app/kart.tsx:22:  if (!coords.length) {
+app/kart.tsx:23:    return { latitude: 65, longitude: 13, latitudeDelta: 18, longitudeDelta: 12 };
+app/kart.tsx:24:  }
+app/kart.tsx:25:  const lats = coords.map((n) => n.latitude);
+app/kart.tsx:26:  const lngs = coords.map((n) => n.longitude);
+app/kart.tsx:27:  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+app/kart.tsx:28:  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+app/kart.tsx:29:  return {
+app/kart.tsx:30:    latitude: (minLat + maxLat) / 2,
+app/kart.tsx:31:    longitude: (minLng + maxLng) / 2,
+app/kart.tsx:32:    latitudeDelta: Math.max(0.2, (maxLat - minLat) * 1.3),
+app/kart.tsx:33:    longitudeDelta: Math.max(0.2, (maxLng - minLng) * 1.3),
+app/kart.tsx:34:  };
+app/kart.tsx:35:}
+app/kart.tsx:36:
+app/kart.tsx:37:export default function Kart() {
+app/kart.tsx:38:  const router = useRouter();
+app/kart.tsx:39:
+app/kart.tsx:40:  // Web: bare info
+app/kart.tsx:41:  if (Platform.OS === "web") {
+app/kart.tsx:42:    const stops = coerceStops(Stops);
+app/kart.tsx:43:    return (
+app/kart.tsx:44:      <View style={{ flex: 1, backgroundColor: "#0b0b0f", padding: 16, gap: 12 }}>
+app/kart.tsx:45:        <Text style={{ color: "#fff", fontSize: 20, fontWeight: "600" }}>Kart (web-visning)</Text>
+app/kart.tsx:46:        <Text style={{ color: "#cfd3dc" }}>Interaktivt kart vises på mobil.</Text>
+app/kart.tsx:47:        <Text style={{ color: "#cfd3dc" }}>Antall stopp i data: {stops.length || 0}</Text>
+app/kart.tsx:48:        <TouchableOpacity onPress={() => router.replace("/start")}>
+app/kart.tsx:49:          <Text style={{ color: "#9ad", fontSize: 16 }}>Til start</Text>
+app/kart.tsx:50:        </TouchableOpacity>
+app/kart.tsx:51:      </View>
+app/kart.tsx:52:    );
+app/kart.tsx:53:  }
+app/kart.tsx:54:
+app/kart.tsx:55:  const stops = useMemo(() => coerceStops(Stops), []);
+app/kart.tsx:56:  const line: LatLng[] = useMemo(
+app/kart.tsx:57:    () => stops.map((s) => ({ latitude: s.lat, longitude: s.lng })),
+app/kart.tsx:58:    [stops]
+app/kart.tsx:59:  );
+app/kart.tsx:60:  const initialRegion = useMemo(() => regionFromCoords(line), [line]);
+app/kart.tsx:61:  const mapRef = useRef<MapView | null>(null);
+app/kart.tsx:62:
+app/kart.tsx:63:  const fitAll = () => {
+app/kart.tsx:64:    if (!mapRef.current || !line.length) return;
+app/kart.tsx:65:    mapRef.current.fitToCoordinates(line, {
+app/kart.tsx:66:      edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
+app/kart.tsx:67:      animated: true,
+app/kart.tsx:68:    });
+app/kart.tsx:69:  };
+app/kart.tsx:70:
+app/kart.tsx:71:  return (
+app/kart.tsx:72:    <View style={{ flex: 1, backgroundColor: "#000" }}>
+app/kart.tsx:73:      <MapView
+app/kart.tsx:74:        ref={mapRef}
+app/kart.tsx:75:        style={{ flex: 1 }}
+app/kart.tsx:76:        initialRegion={initialRegion}
+app/kart.tsx:77:        onMapReady={fitAll}
+app/kart.tsx:78:      >
+app/kart.tsx:79:        {line.length > 0 && <Polyline coordinates={line} strokeWidth={4} />}
+app/kart.tsx:80:        {stops.map((s, idx) => (
+app/kart.tsx:81:          <Marker
+app/kart.tsx:82:            key={`${s.name ?? s.title ?? "stop"}-${idx}`}
+app/kart.tsx:83:            coordinate={{ latitude: s.lat, longitude: s.lng }}
+app/kart.tsx:84:            title={s.title ?? s.name ?? `Stopp ${idx + 1}`}
+app/kart.tsx:85:            description={s.name ?? s.title ?? undefined}
+app/kart.tsx:86:          />
+app/kart.tsx:87:        ))}
+app/kart.tsx:88:      </MapView>
+app/kart.tsx:89:
+app/kart.tsx:90:      <View
+app/kart.tsx:91:        pointerEvents="box-none"
+app/kart.tsx:92:        style={{ position: "absolute", top: 20, right: 16, left: 16, gap: 10 }}
+app/kart.tsx:93:      >
+app/kart.tsx:94:        <View
+app/kart.tsx:95:          style={{ alignSelf: "flex-end", backgroundColor: "rgba(0,0,0,0.5)", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12 }}
+app/kart.tsx:96:        >
+app/kart.tsx:97:          <TouchableOpacity onPress={fitAll}>
+app/kart.tsx:98:            <Text style={{ color: "#fff", fontSize: 14 }}>Tilpass utsnitt</Text>
+app/kart.tsx:99:          </TouchableOpacity>
+app/kart.tsx:100:        </View>
+app/kart.tsx:101:
+app/kart.tsx:102:        <View
+app/kart.tsx:103:          style={{ alignSelf: "flex-start", backgroundColor: "rgba(0,0,0,0.5)", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12 }}
+app/kart.tsx:104:        >
+app/kart.tsx:105:          <TouchableOpacity onPress={() => router.replace("/start")}>
+app/kart.tsx:106:            <Text style={{ color: "#fff", fontSize: 14 }}>Til start</Text>
+app/kart.tsx:107:          </TouchableOpacity>
+app/kart.tsx:108:        </View>
+app/kart.tsx:109:      </View>
+app/kart.tsx:110:    </View>
+app/kart.tsx:111:  );
+app/kart.tsx:112:}
+
+=== KART-KOMPONENTER I app/ ===
+app/kart.tsx:3:import MapView, { Marker, Polyline } from "react-native-maps";
+app/kart.tsx:37:export default function Kart() {
+app/kart.tsx:61:  const mapRef = useRef<MapView | null>(null);
+app/kart.tsx:73:      <MapView
+app/kart.tsx:79:        {line.length > 0 && <Polyline coordinates={line} strokeWidth={4} />}
+app/kart.tsx:88:      </MapView>
+app/kart.android.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.android.tsx:6:export default function KartAndroid() {
+app/kart.android.tsx:10:  const mapRef = useRef<MapView>(null);
+app/kart.android.tsx:24:      <MapView ref={mapRef} style={{ flex: 1 }} provider={PROVIDER_DEFAULT}
+app/kart.android.tsx:28:        <Polyline coordinates={route} />
+app/kart.android.tsx:29:      </MapView>
+app/kart.ios.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.ios.tsx:6:export default function KartIOS() {
+app/kart.ios.tsx:10:  const mapRef = useRef<MapView>(null);
+app/kart.ios.tsx:24:      <MapView ref={mapRef} style={{ flex: 1 }} provider={PROVIDER_DEFAULT}
+app/kart.ios.tsx:28:        <Polyline coordinates={route} />
+app/kart.ios.tsx:29:      </MapView>
+app/kart.native.tsx:3:import MapView, { Marker, Polyline } from 'react-native-maps';
+app/kart.native.tsx:13:export default function KartScreen() {
+app/kart.native.tsx:32:      <MapView style={{ flex: 1 }} initialRegion={initialRegion}>
+app/kart.native.tsx:35:        <Polyline coordinates={[oslo, lillehammer]} />
+app/kart.native.tsx:37:      </MapView>
+app/kart.web.tsx:5:export default function KartWeb() {
+app/kart.tsx.bak_20251017-103237:3:import MapView, { Marker, Polyline } from "react-native-maps";
+app/kart.tsx.bak_20251017-103237:53:export default function Kart() {
+app/kart.tsx.bak_20251017-103237:87:  const mapRef = useRef<MapView | null>(null);
+app/kart.tsx.bak_20251017-103237:103:      <MapView
+app/kart.tsx.bak_20251017-103237:110:          <Polyline
+app/kart.tsx.bak_20251017-103237:123:      </MapView>
+
+=== SØK: Oslo/Lillehammer/koordinater i app/ og src/ ===
+app/kart.android.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.android.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.android.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.android.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.android.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.android.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+app/kart.native.tsx:8:const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.native.tsx:9:const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.native.tsx:33:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.native.tsx:34:        <Marker coordinate={lillehammer} title="Stopp 1" description="Lillehammer" />
+app/kart.ios.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.ios.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.ios.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.ios.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.ios.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.ios.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+src/stops/lillehammer.ts:8:      { text: "Lillehammer", correct: true },
+src/stops/lillehammer.ts:14:    q: "Hva er kjent i Lillehammer?",
+src/data/routeNodes.ts:44:    "lat": 59.208061111111114,
+src/data/routeNodes.ts:49:    "lat": 59.1419,
+src/data/routeNodes.ts:54:    "lat": 59.55932830555555,
+src/data/routeNodes.ts:59:    "lat": 59.669,
+src/data/routeNodes.ts:64:    "lat": 59.05328,
+src/data/routeNodes.ts:65:    "lng": 10.03517
+src/data/routeNodes.ts:69:    "lat": 59.12881111111111,
+src/data/routeNodes.ts:70:    "lng": 10.219711111111112
+src/data/routeNodes.ts:74:    "lat": 59.29805555555556,
+src/data/routeNodes.ts:75:    "lng": 10.42361111111111
+src/data/routeNodes.ts:79:    "lat": 59.420830555555554,
+src/data/routeNodes.ts:80:    "lng": 10.432780555555556
+src/data/routeNodes.ts:84:    "lat": 59.49528055555555,
+src/data/routeNodes.ts:85:    "lng": 10.248611111111112
+src/data/routeNodes.ts:89:    "lat": 59.74536111111111,
+src/data/routeNodes.ts:90:    "lng": 10.205969444444445
+src/data/routeNodes.ts:94:    "lat": 60.168,
+src/data/routeNodes.ts:95:    "lng": 10.262
+src/data/routeNodes.ts:98:    "name": "Oslo",
+src/data/routeNodes.ts:99:    "lat": 59.913333333333334,
+src/data/routeNodes.ts:100:    "lng": 10.738888888888889
+src/data/routeNodes.ts:104:    "lat": 59.43403,
+src/data/routeNodes.ts:105:    "lng": 10.65771
+src/data/routeNodes.ts:109:    "lat": 59.29056111111111,
+src/data/routeNodes.ts:110:    "lng": 11.202780555555556
+src/data/routeNodes.ts:114:    "lat": 59.216667,
+src/data/routeNodes.ts:115:    "lng": 10.95
+src/data/routeNodes.ts:119:    "lat": 59.126389,
+src/data/routeNodes.ts:120:    "lng": 11.482778
+src/data/routeNodes.ts:124:    "lat": 60.19117,
+src/data/routeNodes.ts:125:    "lng": 11.99916
+src/data/routeNodes.ts:129:    "lat": 60.79451,
+src/data/routeNodes.ts:130:    "lng": 11.0783
+src/data/routeNodes.ts:134:    "lat": 60.7925,
+src/data/routeNodes.ts:135:    "lng": 10.695
+src/data/routeNodes.ts:138:    "name": "Lillehammer",
+src/data/routeNodes.ts:140:    "lng": 10.46743
+src/data/routeNodes.ts:150:    "lng": 10.4
+src/data/routeNodes.ts:155:    "lng": 11.496944444444
+src/data/routeNodes.ts:160:    "lng": 11.511667
+src/data/routeNodes.ts:189:    "lat": 60.3925,
+src/data/routeNodes.ts:204:    "lat": 59.41015,
+src/data/routeNodes.ts:219:    "lat": 59.14856,
+src/data/routeNodes.ts:224:    "lat": 59.854138888889,
+src/banks/lightning.ts:141:    { id:"hi15", text:"Hvem var norsk statsminister under OL på Lillehammer (1994)?",
+src/data/stopsIndex.ts:36:  return [{ id: 'lillehammer', name: 'Lillehammer', at: 300 }];
+src/banks/core.ts:10:      { id: "a", label: "Oslo" },
+src/data/byvapen.json:99:    "title": "Oslo",
+src/data/byvapen.json:139:    "title": "Lillehammer",
+src/banks/byer.ts:14:    text: "Hvilket landemerke ligger i Bjørvika i Oslo?",
+src/banks/byer.ts:174:    { id: "b", label: "Universitetet i Oslo" },
+src/banks/byer.ts:337:    { id: "b", label: "Oslo Kammermusikkfestival" },
+src/banks/byer.ts:431:    { id: "d", label: "Oslo" },
+
+=== SØK: routeNodes varianter ===
+
+=== IMPORTS SOM PEKER PÅ KART ===
+
+=== MAPS-BIBLIOTEK I KODE ===
+app/kart.tsx:3:import MapView, { Marker, Polyline } from "react-native-maps";
+app/kart.ios.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.android.tsx:4:import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from 'react-native-maps';
+app/kart.native.tsx:3:import MapView, { Marker, Polyline } from 'react-native-maps';
+app/kart.tsx.bak_20251017-103237:3:import MapView, { Marker, Polyline } from "react-native-maps";
+
+=== package.json (maps-relatert) ===
+51:    "expo-maps": "~0.11.0",
+62:    "react-native-maps": "1.20.1",
+
+=== routeNodes.ts (første 120 linjer) ===
+export const ROUTE_NODES = {
+  "lindesnes-fyr": {
+    "name": "lindesnes-fyr",
+    "lat": 57.9825,
+    "lng": 7.046666666666667
+  },
+  "mandal": {
+    "name": "Mandal",
+    "lat": 58.02722,
+    "lng": 7.44889
+  },
+  "kristiansand": {
+    "name": "Kristiansand",
+    "lat": 58.14672222,
+    "lng": 7.99561111
+  },
+  "grimstad": {
+    "name": "Grimstad",
+    "lat": 58.351944444444,
+    "lng": 8.5444444444444
+  },
+  "arendal": {
+    "name": "Arendal",
+    "lat": 58.466666666667,
+    "lng": 8.7666666666667
+  },
+  "risor": {
+    "name": "Risør",
+    "lat": 58.724722,
+    "lng": 9.23
+  },
+  "farsund": {
+    "name": "Farsund",
+    "lat": 58.082777777778,
+    "lng": 6.7527777777778
+  },
+  "flekkefjord": {
+    "name": "Flekkefjord",
+    "lat": 58.327222222222,
+    "lng": 6.6666666666667
+  },
+  "skien": {
+    "name": "Skien",
+    "lat": 59.208061111111114,
+    "lng": 9.552780555555556
+  },
+  "porsgrunn": {
+    "name": "Porsgrunn",
+    "lat": 59.1419,
+    "lng": 9.6568
+  },
+  "notodden": {
+    "name": "Notodden",
+    "lat": 59.55932830555555,
+    "lng": 9.259292305555556
+  },
+  "kongsberg": {
+    "name": "Kongsberg",
+    "lat": 59.669,
+    "lng": 9.65
+  },
+  "larvik": {
+    "name": "Larvik",
+    "lat": 59.05328,
+    "lng": 10.03517
+  },
+  "sandefjord": {
+    "name": "Sandefjord",
+    "lat": 59.12881111111111,
+    "lng": 10.219711111111112
+  },
+  "tonsberg": {
+    "name": "Tønsberg",
+    "lat": 59.29805555555556,
+    "lng": 10.42361111111111
+  },
+  "horten": {
+    "name": "Horten",
+    "lat": 59.420830555555554,
+    "lng": 10.432780555555556
+  },
+  "holmestrand": {
+    "name": "Holmestrand",
+    "lat": 59.49528055555555,
+    "lng": 10.248611111111112
+  },
+  "drammen": {
+    "name": "Drammen",
+    "lat": 59.74536111111111,
+    "lng": 10.205969444444445
+  },
+  "honefoss": {
+    "name": "Hønefoss",
+    "lat": 60.168,
+    "lng": 10.262
+  },
+  "oslo": {
+    "name": "Oslo",
+    "lat": 59.913333333333334,
+    "lng": 10.738888888888889
+  },
+  "moss": {
+    "name": "Moss",
+    "lat": 59.43403,
+    "lng": 10.65771
+  },
+  "sarpsborg": {
+    "name": "Sarpsborg",
+    "lat": 59.29056111111111,
+    "lng": 11.202780555555556
+  },
+  "fredrikstad": {
+    "name": "Fredrikstad",
+    "lat": 59.216667,
+    "lng": 10.95
+  },
+  "halden": {
+    "name": "Halden",
+    "lat": 59.126389,
+    "lng": 11.482778
+
+=== stops.ts (første 120 linjer) ===
+// Data-snapshot – generert automatisk fra arkiv/midlertidig/routeData.ts. Ikke rediger for hånd.
+export const STOP_NAMES: string[] = [
+  "lindesnes-fyr",
+  "mandal",
+  "kristiansand",
+  "grimstad",
+  "arendal",
+  "risor",
+  "farsund",
+  "flekkefjord",
+  "skien",
+  "porsgrunn",
+  "notodden",
+  "kongsberg",
+  "larvik",
+  "sandefjord",
+  "tonsberg",
+  "horten",
+  "holmestrand",
+  "drammen",
+  "honefoss",
+  "oslo",
+  "moss",
+  "sarpsborg",
+  "fredrikstad",
+  "halden",
+  "kongsvinger",
+  "hamar",
+  "gjovik",
+  "lillehammer",
+  "besseggen",
+  "trondheim",
+  "steinkjer",
+  "namsos",
+  "trollstigen",
+  "molde",
+  "alesund",
+  "kristiansund",
+  "atlanterhavsvegen",
+  "bergen",
+  "floro",
+  "egersund",
+  "haugesund",
+  "sandnes",
+  "stavanger",
+  "skudeneshavn",
+  "gaustatoppen",
+  "dovrefjell",
+  "bodo",
+  "saltstraumen",
+  "narvik",
+  "harstad",
+  "tromso",
+  "mosjoen",
+  "mo-i-rana",
+  "polarsirkelsenteret",
+  "alta",
+  "hammerfest",
+  "vadso",
+  "vardo",
+  "nordkapp-plataet",
+  "kirkenes"
+];
+export const STOP_CUM_METERS: number[] = [
+  0,
+  39467,
+  78803,
+  127061,
+  150322,
+  200390,
+  403455,
+  448876,
+  740555,
+  753272,
+  833004,
+  865681,
+  979463,
+  1000408,
+  1028489,
+  1057313,
+  1081223,
+  1114921,
+  1172649,
+  1229391,
+  1290101,
+  1337165,
+  1359334,
+  1400873,
+  1566124,
+  1665332,
+  1716224,
+  1761990,
+  1925657,
+  2249510,
+  2368662,
+  2448000,
+  2950284,
+  3025372,
+  3107044,
+  3258215,
+  3293103,
+  3785220,
+  4015212,
+  4525444,
+  4682833,
+  4791835,
+  4816032,
+  4910097,
+  5236777,
+  5683682,
+  6547116,
+  6577028,
+  6872924,
+  6972980,
+  7273110,
+  8015822,
+  8102880,
+  8183517,
+  8997713,
+  9136573,
+
+=== app/kart.tsx (første 120 linjer) ===
+import React, { useMemo, useRef } from "react";
+import { Platform, View, Text, TouchableOpacity } from "react-native";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import { useRouter } from "expo-router";
+
+import * as Stops from "@/src/data/stops";
+
+type LatLng = { latitude: number; longitude: number };
+type Stop = { name?: string; title?: string; lat: number; lng: number };
+
+function coerceStops(mod: any): Stop[] {
+  const arr = (mod && (mod.STOPS || mod.default || mod.stops)) || [];
+  return (arr as any[]).map((s: any) => ({
+    name: s.name ?? s.title,
+    title: s.title ?? s.name,
+    lat: Number(s.lat),
+    lng: Number(s.lng),
+  }));
+}
+
+function regionFromCoords(coords: LatLng[]) {
+  if (!coords.length) {
+    return { latitude: 65, longitude: 13, latitudeDelta: 18, longitudeDelta: 12 };
+  }
+  const lats = coords.map((n) => n.latitude);
+  const lngs = coords.map((n) => n.longitude);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+  return {
+    latitude: (minLat + maxLat) / 2,
+    longitude: (minLng + maxLng) / 2,
+    latitudeDelta: Math.max(0.2, (maxLat - minLat) * 1.3),
+    longitudeDelta: Math.max(0.2, (maxLng - minLng) * 1.3),
+  };
+}
+
+export default function Kart() {
+  const router = useRouter();
+
+  // Web: bare info
+  if (Platform.OS === "web") {
+    const stops = coerceStops(Stops);
+    return (
+      <View style={{ flex: 1, backgroundColor: "#0b0b0f", padding: 16, gap: 12 }}>
+        <Text style={{ color: "#fff", fontSize: 20, fontWeight: "600" }}>Kart (web-visning)</Text>
+        <Text style={{ color: "#cfd3dc" }}>Interaktivt kart vises på mobil.</Text>
+        <Text style={{ color: "#cfd3dc" }}>Antall stopp i data: {stops.length || 0}</Text>
+        <TouchableOpacity onPress={() => router.replace("/start")}>
+          <Text style={{ color: "#9ad", fontSize: 16 }}>Til start</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const stops = useMemo(() => coerceStops(Stops), []);
+  const line: LatLng[] = useMemo(
+    () => stops.map((s) => ({ latitude: s.lat, longitude: s.lng })),
+    [stops]
+  );
+  const initialRegion = useMemo(() => regionFromCoords(line), [line]);
+  const mapRef = useRef<MapView | null>(null);
+
+  const fitAll = () => {
+    if (!mapRef.current || !line.length) return;
+    mapRef.current.fitToCoordinates(line, {
+      edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
+      animated: true,
+    });
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#000" }}>
+      <MapView
+        ref={mapRef}
+        style={{ flex: 1 }}
+        initialRegion={initialRegion}
+        onMapReady={fitAll}
+      >
+        {line.length > 0 && <Polyline coordinates={line} strokeWidth={4} />}
+        {stops.map((s, idx) => (
+          <Marker
+            key={`${s.name ?? s.title ?? "stop"}-${idx}`}
+            coordinate={{ latitude: s.lat, longitude: s.lng }}
+            title={s.title ?? s.name ?? `Stopp ${idx + 1}`}
+            description={s.name ?? s.title ?? undefined}
+          />
+        ))}
+      </MapView>
+
+      <View
+        pointerEvents="box-none"
+        style={{ position: "absolute", top: 20, right: 16, left: 16, gap: 10 }}
+      >
+        <View
+          style={{ alignSelf: "flex-end", backgroundColor: "rgba(0,0,0,0.5)", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12 }}
+        >
+          <TouchableOpacity onPress={fitAll}>
+            <Text style={{ color: "#fff", fontSize: 14 }}>Tilpass utsnitt</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{ alignSelf: "flex-start", backgroundColor: "rgba(0,0,0,0.5)", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12 }}
+        >
+          <TouchableOpacity onPress={() => router.replace("/start")}>
+            <Text style={{ color: "#fff", fontSize: 14 }}>Til start</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+=== cache-mapper til info (hvis finnes) ===
+.expo:
+total 16
+drwxr-xr-x@  4 runeandersen  staff  128 Oct 15 12:09 .
+drwxr-xr-x@ 27 runeandersen  staff  864 Oct 17 14:55 ..
+-rw-r--r--@  1 runeandersen  staff  131 Oct 15 12:09 devices.json
+-rw-r--r--@  1 runeandersen  staff  751 Oct 15 11:06 README.md
+
+=== FERDIG ===

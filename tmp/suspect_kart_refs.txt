@@ -1,0 +1,72 @@
+src/stops/lillehammer.ts:4:export const LILLEHAMMER: StopTask[] = [
+src/stops/lillehammer.ts:8:      { text: "Lillehammer", correct: true },
+src/stops/lillehammer.ts:14:    q: "Hva er kjent i Lillehammer?",
+app/kart.android.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.android.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.android.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.android.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.android.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.android.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+src/data/routeNodes.ts:44:    "lat": 59.208061111111114,
+src/data/routeNodes.ts:49:    "lat": 59.1419,
+src/data/routeNodes.ts:54:    "lat": 59.55932830555555,
+src/data/routeNodes.ts:59:    "lat": 59.669,
+src/data/routeNodes.ts:64:    "lat": 59.05328,
+src/data/routeNodes.ts:65:    "lng": 10.03517
+src/data/routeNodes.ts:69:    "lat": 59.12881111111111,
+src/data/routeNodes.ts:70:    "lng": 10.219711111111112
+src/data/routeNodes.ts:74:    "lat": 59.29805555555556,
+src/data/routeNodes.ts:75:    "lng": 10.42361111111111
+src/data/routeNodes.ts:79:    "lat": 59.420830555555554,
+src/data/routeNodes.ts:80:    "lng": 10.432780555555556
+src/data/routeNodes.ts:84:    "lat": 59.49528055555555,
+src/data/routeNodes.ts:85:    "lng": 10.248611111111112
+src/data/routeNodes.ts:89:    "lat": 59.74536111111111,
+src/data/routeNodes.ts:90:    "lng": 10.205969444444445
+src/data/routeNodes.ts:94:    "lat": 60.168,
+src/data/routeNodes.ts:95:    "lng": 10.262
+src/data/routeNodes.ts:98:    "name": "Oslo",
+src/data/routeNodes.ts:99:    "lat": 59.913333333333334,
+src/data/routeNodes.ts:100:    "lng": 10.738888888888889
+src/data/routeNodes.ts:104:    "lat": 59.43403,
+src/data/routeNodes.ts:105:    "lng": 10.65771
+src/data/routeNodes.ts:109:    "lat": 59.29056111111111,
+src/data/routeNodes.ts:110:    "lng": 11.202780555555556
+src/data/routeNodes.ts:114:    "lat": 59.216667,
+src/data/routeNodes.ts:115:    "lng": 10.95
+src/data/routeNodes.ts:119:    "lat": 59.126389,
+src/data/routeNodes.ts:120:    "lng": 11.482778
+src/data/routeNodes.ts:124:    "lat": 60.19117,
+src/data/routeNodes.ts:125:    "lng": 11.99916
+src/data/routeNodes.ts:129:    "lat": 60.79451,
+src/data/routeNodes.ts:130:    "lng": 11.0783
+src/data/routeNodes.ts:134:    "lat": 60.7925,
+src/data/routeNodes.ts:135:    "lng": 10.695
+src/data/routeNodes.ts:138:    "name": "Lillehammer",
+src/data/routeNodes.ts:140:    "lng": 10.46743
+src/data/routeNodes.ts:150:    "lng": 10.4
+src/data/routeNodes.ts:155:    "lng": 11.496944444444
+src/data/routeNodes.ts:160:    "lng": 11.511667
+src/data/routeNodes.ts:189:    "lat": 60.3925,
+src/data/routeNodes.ts:204:    "lat": 59.41015,
+src/data/routeNodes.ts:219:    "lat": 59.14856,
+src/data/routeNodes.ts:224:    "lat": 59.854138888889,
+app/kart.ios.tsx:7:  const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.ios.tsx:8:  const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.ios.tsx:9:  const route = [oslo, { latitude: 60.3920, longitude: 10.5020 }, lillehammer];
+app/kart.ios.tsx:25:        initialRegion={{ latitude: 60.4, longitude: 10.7, latitudeDelta: 2.2, longitudeDelta: 2.2 }}>
+app/kart.ios.tsx:26:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.ios.tsx:27:        <Marker coordinate={lillehammer} title="Sjekkpunkt" description="Lillehammer" />
+app/kart.native.tsx:8:const oslo = { latitude: 59.9139, longitude: 10.7522 };
+app/kart.native.tsx:9:const lillehammer = { latitude: 61.1153, longitude: 10.4662 };
+app/kart.native.tsx:33:        <Marker coordinate={oslo} title="Start" description="Oslo" />
+app/kart.native.tsx:34:        <Marker coordinate={lillehammer} title="Stopp 1" description="Lillehammer" />
+src/data/stopsIndex.ts:36:  return [{ id: 'lillehammer', name: 'Lillehammer', at: 300 }];
+src/data/byvapen.json:99:    "title": "Oslo",
+src/data/byvapen.json:139:    "title": "Lillehammer",
+src/banks/lightning.ts:141:    { id:"hi15", text:"Hvem var norsk statsminister under OL på Lillehammer (1994)?",
+src/banks/core.ts:10:      { id: "a", label: "Oslo" },
+src/banks/byer.ts:14:    text: "Hvilket landemerke ligger i Bjørvika i Oslo?",
+src/banks/byer.ts:174:    { id: "b", label: "Universitetet i Oslo" },
+src/banks/byer.ts:337:    { id: "b", label: "Oslo Kammermusikkfestival" },
+src/banks/byer.ts:431:    { id: "d", label: "Oslo" },
