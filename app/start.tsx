@@ -1,37 +1,51 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { Link } from 'expo-router';
-import { getMetersSnapshot, publishMeters } from '@/src/lib/progressBus';
+import { useRouter, Link } from 'expo-router';
 import { getProfile } from '@/src/state/profile';
 
-export default function Start() {
-  const total = getMetersSnapshot();
-  const p = getProfile();
-  const displayName = p && typeof p === 'object' && 'name' in p && String((p as any).name || '').trim()
-    ? String((p as any).name).trim()
-    : 'Spiller';
-  const ageLabel = (p && typeof p === 'object' && 'age' in p && (p as any).age)
-    ? String((p as any).age)
-    : '—';
+export default function StartScreen() {
+  const router = useRouter();
+  const p: any = getProfile();
+  const name = p?.name ? String(p.name).trim() : 'Spiller';
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#111', padding: 24, gap: 14, justifyContent: 'center' }}>
-      <Text style={{ color: 'white', fontSize: 22, fontWeight: '700' }}>Start</Text>
+    <View style={{ flex:1, padding:24, backgroundColor:'#111', gap:16 }}>
+      <Text style={{ color:'#9ca3af' }}>Hei, {name}</Text>
+      <Text style={{ color:'white', fontSize:24, fontWeight:'800' }}>Etappe 1</Text>
+      <Text style={{ color:'#d1d5db', fontSize:18, marginTop:4 }}>Lindesnes fyr → Mandal</Text>
 
-      <View style={{ backgroundColor: '#1f2937', padding: 12, borderRadius: 12, gap: 4 }}>
-        <Text style={{ color: 'white', fontWeight: '700' }}>{displayName}</Text>
-        <Text style={{ color: '#9ca3af' }}>Aldersgruppe: {ageLabel}</Text>
-        <Link href="/profile" style={{ color: '#60a5fa', marginTop: 6 }}>Rediger profil</Link>
-      </View>
-
-      <Text style={{ color: '#9ca3af' }}>Total meter denne økten: <Text style={{ color: 'white', fontWeight: '700' }}>{total}</Text></Text>
-
-      <Link href="/intro/1" style={{ color: '#60a5fa', marginTop: 12 }}>Info før du starter</Link>
-      <Link href="/play" style={{ color: '#60a5fa' }}>Start spill</Link>
-      <Link href="/kart" style={{ color: '#60a5fa' }}>Se kart</Link>
-
-      <Pressable onPress={() => { publishMeters(0); }} style={{ marginTop: 16, backgroundColor: '#e5e7eb', padding: 12, borderRadius: 10 }}>
-        <Text style={{ textAlign: 'center' }}>Nullstill meter</Text>
+      <Pressable
+        onPress={() => router.push('/intro/1')}
+        style={{ backgroundColor:'#374151', padding:12, borderRadius:12, marginTop:8 }}
+      >
+        <Text style={{ color:'white', textAlign:'center', fontWeight:'700' }}>
+          Info før du starter
+        </Text>
       </Pressable>
+
+      <Pressable
+        onPress={() => router.push('/play')}
+        style={{ backgroundColor:'#10b981', padding:14, borderRadius:12, marginTop:8 }}
+      >
+        <Text style={{ color:'white', textAlign:'center', fontWeight:'800' }}>
+          Start quiz
+        </Text>
+      </Pressable>
+
+      {/* NY: Se kart */}
+      <Pressable
+        onPress={() => router.replace('/kart')}
+        style={{ backgroundColor:'#1f2937', padding:12, borderRadius:12, marginTop:8 }}
+      >
+        <Text style={{ color:'white', textAlign:'center', fontWeight:'700' }}>
+          Se kart
+        </Text>
+      </Pressable>
+
+      <View style={{ flex:1 }} />
+      <Link href="/home" style={{ color:'#60a5fa' }}>
+        Til hjem
+      </Link>
     </View>
   );
 }
