@@ -1,0 +1,31 @@
+import * as React from "react";
+import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import MapViewSvg from "@/components/map/MapViewSvg";
+import type { RouteLeg } from "@/src/types/route";
+
+// Les JSON lokalt og normaliser
+// (bruk require for å unngå tsconfig resolveJsonModule-krav)
+const ROUTE_LEGS_JSON = require("../assets/route/route-legs.json");
+const LEGS: RouteLeg[] = Array.isArray(ROUTE_LEGS_JSON?.ROUTE_LEGS) ? ROUTE_LEGS_JSON.ROUTE_LEGS : (Array.isArray(ROUTE_LEGS_JSON) ? ROUTE_LEGS_JSON : []);
+
+export default function KartSvgScreen() {
+  return (
+    <SafeAreaView style={styles.root}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Kart (SVG)</Text>
+        <Text style={styles.sub}>Etapper: {LEGS.length}</Text>
+      </View>
+      <View style={styles.body}>
+        <MapViewSvg legs={LEGS} />
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: "#fff" },
+  header: { paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: "#ddd" },
+  title: { fontSize: 18, fontWeight: "800" },
+  sub: { marginTop: 2, color: "#666" },
+  body: { flex: 1 },
+});

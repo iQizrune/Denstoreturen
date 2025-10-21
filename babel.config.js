@@ -2,6 +2,17 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-    plugins: [], // fjern "expo-router/babel" herfra
+    plugins: [
+      [
+        "module-resolver",
+        {
+          root: ["."],
+          alias: {
+            "@": "./"        // gjør at "@/src/..." peker til prosjektroten
+          },
+          extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
+        }
+      ]
+    ]
   };
 };

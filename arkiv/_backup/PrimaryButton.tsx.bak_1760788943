@@ -1,0 +1,21 @@
+import * as React from "react";
+import { Pressable, Text, StyleSheet, ViewStyle } from "react-native";
+
+export type PrimaryButtonProps = {
+  title: string;
+  onPress?: () => void;
+  style?: ViewStyle;
+};
+
+export default function PrimaryButton({ title, onPress, style }: PrimaryButtonProps) {
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={[styles.btn, style]}>
+      <Text style={styles.txt}>{title}</Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  btn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: "#2b6cb0" },
+  txt: { color: "#fff", fontWeight: "700" },
+});

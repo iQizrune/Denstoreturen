@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
-import StopModule from '../StopModule';
+import StopModule from "../src/partials/StopModule";
 import { enterStop, exitStop } from '@/src/engine/conductor';
 import { markStopSeen, advanceAfterStop, getCurrentStop } from '@/src/state/route';
-import { getStopQuiz } from '@/src/banks/stopQuizAdapter';
+import getStopQuiz from "@/src/banks/getStopQuizByer";
 
 export default function Stop() {
   const router = useRouter();

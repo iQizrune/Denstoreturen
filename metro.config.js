@@ -1,12 +1,14 @@
 // metro.config.js
-// Expo + react-native-svg-transformer oppsett
 const { getDefaultConfig } = require('expo/metro-config');
 
-const config = getDefaultConfig(__dirname);
+module.exports = (async () => {
+  const config = await getDefaultConfig(__dirname);
 
-// Bruk SVG-transformer, og håndter .svg som kildefil (ikke asset)
-config.transformer.babelTransformerPath = require.resolve('react-native-svg-transformer');
-config.resolver.assetExts = config.resolver.assetExts.filter((ext) => ext !== 'svg');
-config.resolver.sourceExts = [...config.resolver.sourceExts, 'svg'];
+  if (!config.resolver.assetExts.includes('html')) {
+    config.resolver.assetExts.push('html');
+  }
 
-module.exports = config;
+  // Viktig: ikke tukle med .json – la Metro håndtere JSON som modul.
+
+  return config;
+})();

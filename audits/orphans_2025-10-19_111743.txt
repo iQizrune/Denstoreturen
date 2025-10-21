@@ -1,0 +1,2 @@
+app/+not-found.tsx
+app/kart_webview.tsx

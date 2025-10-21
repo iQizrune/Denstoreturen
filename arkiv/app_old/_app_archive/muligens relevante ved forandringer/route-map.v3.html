@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+<style id="legs-debug-style">
+#legs-debug{position:fixed;top:8px;left:8px;z-index:99999;
+background:#C62828;color:#fff;font:600 12px/1.3 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+padding:6px 8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+#legs-debug.ok{background:#2E7D32}
+#legs-debug .mono{font-family:ui-monospace,Menlo,monospace}
+</style>
+\n<script>(function(){
+  var tries=0,max=20;
+  function sync(){
+    try{
+      var hasRL = Array.isArray(window.ROUTE_LEGS);
+      var hasrl = Array.isArray(window.route_legs);
+      if (hasRL) window.route_legs = window.ROUTE_LEGS;
+      else if (hasrl) window.ROUTE_LEGS = window.route_legs;
+      if (window.ReactNativeWebView){
+        var n = Array.isArray(window.ROUTE_LEGS)?window.ROUTE_LEGS.length:(Array.isArray(window.route_legs)?window.route_legs.length:"?");
+        window.ReactNativeWebView.postMessage("html-sync:"+n);
+      } else if (window.console){ console.log("[HTML] route_legs sync", {ROUTE_LEGS:Array.isArray(window.ROUTE_LEGS)&&window.ROUTE_LEGS.length, route_legs:Array.isArray(window.route_legs)&&window.route_legs.length}); }
+    }catch(e){ if (window.console) console.log("[HTML] sync error", e&&e.message); }
+    if(++tries<max) setTimeout(sync,50);
+  }
+  document.addEventListener("DOMContentLoaded", sync);
+  sync();
+})();</script>\n
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="initial-scale=1, width=device-width, user-scalable=no"/>
+  <title>Route Map v3</title>
+  <style>
+    html, body, #map { background:#f5f5f5; width:100vw; height:100vh; display:block; }
+    #map { background:#f5f5f5; }
+    .debug { position:fixed; left:8px; bottom:8px; background:rgba(0,0,0,.6); color:#fff; padding:6px 8px; border-radius:6px; font:12px/1.2 -apple-system, system-ui, sans-serif; }
+    .segline { stroke:#c33; stroke-width:3; fill:none; }
+    .active { stroke:#06f; stroke-width:4; }
+    .marker { fill:#06f; stroke:#fff; stroke-width:2; r:6; }
+  </style>
+</head>
+<body>
+<div id="legs-debug">kart.html … <span class="mono">N/A</span></div>
+<script id="legs-debug-script">(function(){
+  var el = document.getElementById("legs-debug");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "legs-debug";
+    el.innerHTML = "kart.html … <span class=\"mono\">N/A</span>";
+    document.body.appendChild(el);
+  }
+  function n(v){ return Array.isArray(v) ? v.length : (v? "?" : 0); }
+  function tick(){
+    try{
+      var n1 = n(window.ROUTE_LEGS);
+      var n2 = n(window.route_legs);
+      var nBest = (typeof n1 === "number" ? n1 : 0);
+      if (typeof n2 === "number" && n2 > nBest) nBest = n2;
+      el.innerHTML = "kart.html … legs: <span class=\"mono\">" + nBest + "</span>";
+      if (nBest>0) el.classList.add("ok"); else el.classList.remove("ok");
+    }catch(e){ el.innerHTML = "kart.html … <span class=\"mono\">ERR</span>"; }
+  }
+  tick();
+  document.addEventListener("DOMContentLoaded", tick);
+  setInterval(tick, 300);
+})();</script>
+
+  <svg id="map">
+  <rect id="bgRect" x="0" y="0" width="100%" height="100%" fill="#eee"/></svg>
+  <div class="debug" id="dbg">loading…</div>
+
+  <script>
+  (function () {
+    const RN = (typeof window.ReactNativeWebView !== "undefined") ? window.ReactNativeWebView : null;
+    const dbg = (t) => { const d=document.getElementById('dbg'); if(d) d.textContent = t; };
+
+    // Data fra RN er allerede injisert i window.ROUTE_LEGS
+    const ROUTE_LEGS = (() => {
+  let v =
+    (Array.isArray(window.ROUTE_LEGS) ? window.ROUTE_LEGS :
+    Array.isArray(window.route_legs) ? window.route_legs :
+    Array.isArray(window.ROUTE_LEGS?.ROUTE_LEGS) ? window.ROUTE_LEGS.ROUTE_LEGS :
+    Array.isArray(window.route_legs?.ROUTE_LEGS) ? window.route_legs.ROUTE_LEGS :
+    window.ROUTE_LEGS ?? window.route_legs ?? []);
+  if (!Array.isArray(v) && typeof v === "string") {
+    try { const j = JSON.parse(v); if (Array.isArray(j)) v = j; } catch {}
+  }
+  if (!Array.isArray(v)) v = [];
+  window.ROUTE_LEGS = v;
+  window.route_legs = v;
+  return v;
+})();
+
+    if (!Array.isArray(ROUTE_LEGS) || ROUTE_LEGS.length === 0) {
+      dbg("mangler ROUTE_LEGS (injeksjon feilet?)");
+      return;
+    }
+    dbg("data ok (" + ROUTE_LEGS.length + " etapper)");
+
+    const svg = document.getElementById("map");
+const measure = () => {
+  const r = svg.getBoundingClientRect();
+  let w = Math.floor(r.width || window.innerWidth || document.documentElement.clientWidth || 360);
+  let h = Math.floor(r.height || window.innerHeight || document.documentElement.clientHeight || 640);
+  if (w < 2) w = 360;
+  if (h < 2) h = 640;
+  return { w, h };
+};
+let { w: W, h: H } = measure();
+svg.setAttribute("width", String(W));
+svg.setAttribute("height", String(H));
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+let __tries = 0;
+const __retrySize = () => {
+  const r = measure();
+  if ((r.w !== W || r.h !== H) && __tries < 10) {
+    W = r.w; H = r.h;
+    svg.setAttribute("width", String(W));
+    svg.setAttribute("height", String(H));
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  }
+  __tries++;
+  if (__tries < 10) setTimeout(__retrySize, 80);
+};
+setTimeout(__retrySize, 0);
+// Tving SVG-størrelse eksplisitt (i tillegg til CSS)
+svg.setAttribute("width", String(W));
+svg.setAttribute("height", String(H));
+
+    // Finn bbox
+    let minX=  999, minY=  999, maxX= -999, maxY= -999;
+    for (const leg of ROUTE_LEGS) {
+      for (const [lat,lng] of leg.path) {
+        if (lng < minX) minX = lng;
+        if (lng > maxX) maxX = lng;
+        if (lat < minY) minY = lat;
+        if (lat > maxY) maxY = lat;
+      }
+    }
+    // Skaler til SVG
+    const pad = 0.04; // 4% padding
+    const dx = (maxX - minX) * (1 + pad*2);
+    const dy = (maxY - minY) * (1 + pad*2);
+    const scaleX = W / dx;
+    const scaleY = H / dy;
+    const scale = Math.min(scaleX, scaleY);
+    const offX = minX - (maxX - minX)*pad;
+    const offY = minY - (maxY - minY)*pad;
+
+    const p2s = ([lat,lng]) => {
+      const x = (lng - offX) * scale;
+      const y = H - ( (lat - offY) * scale ); // invert y
+      return [x,y];
+    };
+
+    // Tegn alle etapper
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    svg.appendChild(g);
+
+    const segPaths = [];
+    ROUTE_LEGS.forEach((leg, idx) => {
+      const d = leg.path.map((pt, i) => {
+        const [x,y] = p2s(pt);
+        return (i===0 ? "M" : "L") + x + "," + y;
+      }).join(" ");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("class", "segline");
+      path.dataset.index = String(idx);
+      path.addEventListener("click", () => {
+        setActiveLeg(idx);
+        // vis lengde i debug ved klikk
+        dbg(`etappe ${idx+1}: ${(leg.distanceMeters/1000).toFixed(1)} km`);
+      });
+      g.appendChild(path);
+      segPaths.push(path);
+    });
+
+    // Blå markør
+    const mark = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    mark.setAttribute("class", "marker");
+    mark.setAttribute("cx", "-100");
+    mark.setAttribute("cy", "-100");
+    svg.appendChild(mark);
+
+    let active = -1;
+
+    function setActiveLeg(i) {
+      active = i;
+      segPaths.forEach((p, j) => p.setAttribute("class", j===i ? "segline active" : "segline"));
+      // zoom til aktiv etappe
+      if (i >= 0) {
+        const leg = ROUTE_LEGS[i];
+        let minx=999, miny=999, maxx=-999, maxy=-999;
+        for (const pt of leg.path) {
+          const [x,y] = p2s(pt);
+          if (x < minx) minx = x; if (x > maxx) maxx = x;
+          if (y < miny) miny = y; if (y > maxy) maxy = y;
+        }
+        const boxPad = 24;
+        svg.setAttribute("viewBox", `${Math.max(minx - boxPad,0)} ${Math.max(miny - boxPad,0)} ${(maxx-minx)+boxPad*2} ${(maxy-miny)+boxPad*2}`);
+      } else {
+        svg.removeAttribute("viewBox");
+      }
+      RN?.postMessage(JSON.stringify({ type: "activeLeg", leg: i }));
+    }
+
+    function setProgress(i, pointIdx) {
+      if (i < 0 || i >= ROUTE_LEGS.length) return;
+      const leg = ROUTE_LEGS[i];
+      const clamped = Math.max(0, Math.min(pointIdx, leg.path.length-1));
+      const [x,y] = p2s(leg.path[clamped]);
+      mark.setAttribute("cx", String(x));
+      mark.setAttribute("cy", String(y));
+      RN?.postMessage(JSON.stringify({ type: "progress", leg: i, pointIdx: clamped }));
+    }
+
+    // Lytt på meldinger fra RN
+    window.addEventListener("message", (ev) => {
+      let msg;
+      try { msg = JSON.parse(ev.data); } catch {}
+      if (!msg) return;
+      if (msg.type === "setActiveLeg") setActiveLeg(msg.leg|0);
+      if (msg.type === "setProgress") setProgress(msg.leg|0, msg.pointIdx|0);
+    });
+
+    // Klar
+    RN?.postMessage(JSON.stringify({ type: "routeMapReady" }));
+    dbg("data ok (" + ROUTE_LEGS.length + " etapper) – klart");
+  })();
+  </script>
+</body>
+</html>

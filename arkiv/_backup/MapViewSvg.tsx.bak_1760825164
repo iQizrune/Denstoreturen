@@ -1,0 +1,310 @@
+// components/map/MapViewSvg.tsx (smooth pan/pinch)
+import * as React from "react";
+import { useMemo, useRef, useState, useCallback } from "react";
+import {
+  View, Text, StyleSheet, LayoutChangeEvent,
+  PanResponder, GestureResponderEvent, PanResponderGestureState, NativeTouchEvent
+} from "react-native";
+import Svg, { G, Path, Circle } from "react-native-svg";
+import type { RouteLeg } from "@/src/types/route";
+import { legsBoundsProjected, fitBoundsProjected, projectPoint } from "@/src/map/projection";
+
+type VP = { width:number; height:number; pad?:number };
+type Stop = { id:string; name:string; lat:number; lng:number; index:number; at?:number };
+
+export type MapViewSvgProps = {
+  legs: RouteLeg[];
+  initialActive?: number;
+  currentLeg?: number;
+  focusPad?: number;
+  stops?: Stop[];
+  currentStopIndex?: number;
+  onLegPress?: (index:number)=>void;
+};
+
+// enkel dp-forenkling i pikselrom
+function dpSimplify(points: readonly [number,number][], tol: number): [number,number][] {
+  if (points.length <= 2) return points.slice() as [number,number][];
+  const sqTol = tol*tol, keep = new Array(points.length).fill(false);
+  keep[0] = keep[points.length-1] = true;
+  const stack: [number, number][] = [[0, points.length-1]];
+  function sqSeg(p:[number,number], a:[number,number], b:[number,number]){
+    let x=a[0], y=a[1], dx=b[0]-x, dy=b[1]-y;
+    if (dx||dy){ let t=((p[0]-x)*dx + (p[1]-y)*dy)/(dx*dx+dy*dy); t=Math.max(0,Math.min(1,t)); x+=t*dx; y+=t*dy; }
+    const ux=p[0]-x, uy=p[1]-y; return ux*ux+uy*uy;
+  }
+  while (stack.length){
+    const [f,l]=stack.pop()!, A=points[f], B=points[l];
+    let idx=-1, max=0;
+    for (let i=f+1;i<l;i++){ const d=sqSeg(points[i] as any, A as any, B as any); if (d>max){max=d;idx=i;} }
+    if (max>sqTol && idx!==-1){ keep[idx]=true; stack.push([f,idx],[idx,l]); }
+  }
+  const out: [number,number][] = []; for (let i=0;i<points.length;i++) if (keep[i]) out.push(points[i] as any); return out;
+}
+
+export default function MapViewSvg({
+  legs,
+  initialActive = -1,
+  currentLeg,
+  focusPad = 0.15,
+  stops,
+  currentStopIndex,
+  onLegPress,
+}: MapViewSvgProps) {
+  const [vp, setVp] = useState<VP>({ width: 0, height: 0, pad: 0.04 });
+  const [active, setActive] = useState(initialActive);
+
+  // Base fit + sentrering
+  const bounds = useMemo(()=> legsBoundsProjected(legs), [legs]);
+  const base   = useMemo(()=> fitBoundsProjected(bounds, vp), [bounds, vp]);
+  const mx = (vp.width  - (bounds.maxX - bounds.minX) * base.scale * (1 + (vp.pad ?? 0) * 2)) / 2;
+  const my = (vp.height - (bounds.maxY - bounds.minY) * base.scale * (1 + (vp.pad ?? 0) * 2)) / 2;
+
+  const onLayout = useCallback((e:LayoutChangeEvent)=>{
+    const { width, height } = e.nativeEvent.layout;
+    if (width>0 && height>0) setVp(v => (v.width===width && v.height===height) ? v : ({...v, width, height}));
+  },[]);
+
+  // Pre-projisér legs -> pikselrom (sentrert)
+  const projectedLegs = useMemo(()=>{
+    if (vp.width===0 || vp.height===0) return [] as [number,number][][];
+    return legs.map(leg => leg.path.map(([lat,lng]) => {
+      const [x,y] = projectPoint(lat,lng,vp,base.scale,base.offX,base.offY);
+      return [x+mx, y+my] as [number,number];
+    }));
+  }, [legs, vp, base, mx, my]);
+
+  // Forenkle (ytelse) — litt mindre forenkling for mer detaljer
+  const simplifiedLegs = useMemo(()=>{
+    const tol = 0.4; // lav tol => flere punkter => glattere kurver
+    return projectedLegs.map(points => dpSimplify(points, tol));
+  }, [projectedLegs]);
+
+  // Synlig hovedpath (rød) + aktiv (blå m/ full detalj)
+  const visiblePath = useMemo(()=>{
+    const parts: string[] = [];
+    for (const leg of simplifiedLegs) {
+      if (leg.length === 0) continue;
+      parts.push(`M${leg[0][0]},${leg[0][1]}`);
+      for (let i=1;i<leg.length;i++) parts.push(`L${leg[i][0]},${leg[i][1]}`);
+    }
+    return parts.join(" ");
+  }, [simplifiedLegs]);
+
+  const activePath = useMemo(()=>{
+    const idx = active;
+    if (idx < 0 || idx >= projectedLegs.length) return "";
+    const leg = projectedLegs[idx]; // uforenklet for aktiv
+    if (leg.length === 0) return "";
+    const parts = [`M${leg[0][0]},${leg[0][1]}`];
+    for (let i=1;i<leg.length;i++) parts.push(`L${leg[i][0]},${leg[i][1]}`);
+    return parts.join(" ");
+  }, [projectedLegs, active]);
+
+  // === Smooth transform: current -> target (lerp i RAF) ===
+  const gRef = useRef<any>(null);
+  const markerRefs = useRef<any[]>([]);
+  const markerPos  = useRef<{x:number; y:number}[]>([]);
+
+  const current = useRef({ zoom: 1, tx: 0, ty: 0 });
+  const target  = useRef({ zoom: 1, tx: 0, ty: 0 });
+  const rafId   = useRef<number | null>(null);
+
+  const clampZoom = (z:number)=> Math.max(0.5, Math.min(30, z));
+  const applyNow = () => {
+    const { tx, ty, zoom } = current.current;
+    gRef.current?.setNativeProps({ transform: [{ translateX: tx }, { translateY: ty }, { scale: zoom }] } as any);
+    const inv = 1 / (zoom || 1);
+    for (let i=0;i<markerRefs.current.length;i++){
+      const m = markerRefs.current[i];
+      const p = markerPos.current[i];
+      if (!m || !p) continue;
+      m.setNativeProps({ transform: [{ translateX: p.x }, { translateY: p.y }, { scale: inv }] } as any);
+    }
+  };
+
+  const tick = () => {
+    rafId.current = requestAnimationFrame(tick);
+    const a = 0.14; // lerp-faktor (0.10–0.18 gir myk respons)
+    const c = current.current, t = target.current;
+    const dx = t.tx - c.tx, dy = t.ty - c.ty, dz = t.zoom - c.zoom;
+    if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01 && Math.abs(dz) < 0.0005) {
+      c.tx = t.tx; c.ty = t.ty; c.zoom = t.zoom;
+      applyNow();
+      return;
+    }
+    c.tx += dx * a;
+    c.ty += dy * a;
+    c.zoom += dz * a;
+    applyNow();
+  };
+
+  React.useEffect(() => {
+    rafId.current = requestAnimationFrame(tick);
+    return () => { if (rafId.current!=null) cancelAnimationFrame(rafId.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Pan (én finger) — mindre følsomhet
+  const panRef = useRef({ startTx:0, startTy:0, lastTap:0 });
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (e, g) => g.dx*g.dx + g.dy*g.dy > 4, // liten terskel
+      onMoveShouldSetPanResponder:  (e, g) => g.dx*g.dx + g.dy*g.dy > 4,
+      onPanResponderGrant: () => {
+        const now = Date.now();
+        if (now - panRef.current.lastTap < 250) {
+          // dobbel-tapp: smooth reset
+          target.current = { zoom: 1, tx: 0, ty: 0 };
+          panRef.current.lastTap = 0;
+          return;
+        }
+        panRef.current.lastTap = now;
+        panRef.current.startTx = target.current.tx;
+        panRef.current.startTy = target.current.ty;
+      },
+      onPanResponderMove: (_e, g: PanResponderGestureState) => {
+        const sens = 0.85; // < 1.0 => roligere panorering
+        target.current.tx = panRef.current.startTx + g.dx * sens;
+        target.current.ty = panRef.current.startTy + g.dy * sens;
+      },
+    })
+  ).current;
+
+  // Pinch (to fingre) — dempet zoom-respons
+  function dist2(a: NativeTouchEvent, b: NativeTouchEvent){ const dx=a.pageX-b.pageX, dy=a.pageY-b.pageY; return Math.hypot(dx,dy); }
+  function centroid(a: NativeTouchEvent, b: NativeTouchEvent){ return { cx:(a.pageX+b.pageX)/2, cy:(a.pageY+b.pageY)/2 }; }
+  const pinchRef = useRef({ pinching:false, startZoom:1, startDist:1, startTx:0, startTy:0, startCx:0, startCy:0 });
+
+  const onTouchStart = (e: GestureResponderEvent) => {
+    const ts = e.nativeEvent.touches;
+    if (ts.length === 2) {
+      pinchRef.current.pinching = true;
+      pinchRef.current.startZoom = target.current.zoom;
+      pinchRef.current.startDist = dist2(ts[0], ts[1]);
+      const { cx, cy } = centroid(ts[0], ts[1]);
+      pinchRef.current.startCx = cx; pinchRef.current.startCy = cy;
+      pinchRef.current.startTx = target.current.tx; pinchRef.current.startTy = target.current.ty;
+    }
+  };
+  const onTouchMove = (e: GestureResponderEvent) => {
+    const ts = e.nativeEvent.touches;
+    if (pinchRef.current.pinching && ts.length === 2) {
+      const d  = dist2(ts[0], ts[1]) || 1;
+      const rawScale = d / (pinchRef.current.startDist || 1);
+      const eased    = Math.pow(rawScale, 0.85); // < 1.0 demper zoomhastigheten
+      const nz = clampZoom(pinchRef.current.startZoom * eased);
+      const zx = nz / (pinchRef.current.startZoom || 1);
+      const { cx, cy } = centroid(ts[0], ts[1]);
+      target.current.zoom = nz;
+      target.current.tx   = cx - (cx - pinchRef.current.startTx) * zx;
+      target.current.ty   = cy - (cy - pinchRef.current.startTy) * zx;
+    }
+  };
+  const onTouchEnd = (e: GestureResponderEvent) => { if (e.nativeEvent.touches.length < 2) pinchRef.current.pinching = false; };
+
+  // Klikk på etappe
+  const onPressLeg = (i:number) => { setActive(i); onLegPress?.(i); };
+
+  // --- Fokus ved start: currentLeg > currentStopIndex ---
+  React.useEffect(() => {
+    if (vp.width===0 || vp.height===0) return;
+
+    // 1) Etappe prioritet
+    const legIdx = (typeof currentLeg === "number" && currentLeg >= 0 && currentLeg < simplifiedLegs.length) ? currentLeg : -1;
+    if (legIdx >= 0) {
+      const pts = simplifiedLegs[legIdx];
+      if (!pts || pts.length===0) return;
+      let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+      for (const [x,y] of pts){ if (x<minX) minX=x; if (x>maxX) maxX=x; if (y<minY) minY=y; if (y>maxY) maxY=y; }
+      const pad = Math.max(0, Math.min(0.4, focusPad));
+      const dx = Math.max(1, maxX - minX), dy = Math.max(1, maxY - minY);
+      const baseZoom = Math.min(vp.width/(dx*(1+pad*2)), vp.height/(dy*(1+pad*2)));
+      const boost = 2.4;
+      const zoom = clampZoom(baseZoom * boost);
+      const cx = (minX+maxX)/2, cy=(minY+maxY)/2;
+      target.current = { zoom, tx: vp.width/2 - cx*zoom, ty: vp.height/2 - cy*zoom };
+      return;
+    }
+
+    // 2) Hvis ingen etappe, men stopp-index: zoom rundt punktet
+    if (typeof currentStopIndex === "number" && stops && stops[currentStopIndex]) {
+      const s = stops[currentStopIndex];
+      const [px,py] = projectPoint(s.lat, s.lng, vp, base.scale, base.offX, base.offY);
+      const x = px + mx, y = py + my;
+      const zoom = 8;
+      target.current = { zoom: clampZoom(zoom), tx: vp.width/2 - x*zoom, ty: vp.height/2 - y*zoom };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vp.width, vp.height, simplifiedLegs, currentLeg, currentStopIndex, stops, focusPad]);
+
+  // Markører (konstant skjermstørrelse)
+  const markerRadius = 4;
+  const stopNodes = useMemo(() => {
+    markerRefs.current = [];
+    markerPos.current = [];
+    if (!stops || stops.length===0 || vp.width===0 || vp.height===0) return null;
+    return stops.map((s, i) => {
+      const [px,py] = projectPoint(s.lat, s.lng, vp, base.scale, base.offX, base.offY);
+      const x = px + mx, y = py + my;
+      markerPos.current[i] = { x, y };
+      const isCurrent = typeof currentStopIndex === "number" && currentStopIndex === i;
+      const fill = isCurrent ? "#1565C0" : "#C62828";
+      return (
+        <G key={s.id} ref={(el)=>{ markerRefs.current[i]=el; }}>
+          <Circle cx={0} cy={0} r={markerRadius} fill={fill} stroke="#fff" strokeWidth={1.5} />
+        </G>
+      );
+    });
+  }, [stops, currentStopIndex, vp, base, mx, my]);
+
+  // Første render: sikre at transform brukes
+  React.useEffect(() => { applyNow(); }, []);
+
+  return (
+    <View style={styles.root} onLayout={onLayout}>
+      {vp.width>0 && vp.height>0 ? (
+        <>
+          <Svg width="100%" height="100%">
+            <G ref={gRef as any}>
+              <Path d={visiblePath} fill="none" stroke="#c33" strokeWidth={3} vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
+              {activePath ? <Path d={activePath} fill="none" stroke="#06f" strokeWidth={4} vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" /> : null}
+              {stopNodes}
+              {simplifiedLegs.map((leg,i)=>(
+                leg.length ? <Path key={`hit-${i}`} d={`M${leg[0][0]},${leg[0][1]} L${leg.slice(1).map(p=>`${p[0]},${p[1]}`).join(" L")}`} fill="none" stroke="transparent" strokeWidth={18} vectorEffect="non-scaling-stroke" onPress={()=>onLegPress?.(i)} /> : null
+              ))}
+            </G>
+          </Svg>
+
+          <View
+            style={StyleSheet.absoluteFill}
+            pointerEvents="auto"
+            {...panResponder.panHandlers}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchEnd}
+          />
+        </>
+      ) : null}
+
+      <View style={styles.hud} pointerEvents="none">
+        <Text style={styles.hudText}>
+          etapper: {legs.length} • aktiv: {active>=0?active+1:"-"} ({active>=0 ? legs[active]?.path?.length ?? 0 : 0} pts) • {vp.width}×{vp.height}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: "#f5f5f5" },
+  hud: {
+    position: "absolute",
+    left: 8, bottom: 8,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 8, paddingVertical: 6,
+    borderRadius: 8,
+  },
+  hudText: { color: "#fff", fontWeight: "600" },
+});
