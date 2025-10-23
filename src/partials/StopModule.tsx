@@ -10,6 +10,11 @@ import BagPanel from "@/components/bag/BagPanel";
 import { BagIcon } from "@/components/bag/BagIcon";
 import { addCoat } from "@/components/bag/bagStore";
 import { publishAwardCoat } from "@/src/app-moved/kartBus";
+import { publishStageStart } from "@/src/lib/stageBus";
+import { queueStageStart } from "@/src/lib/stageQueue";
+import { getStops } from "@/src/state/route";
+import { STOP_CUM_METERS } from "@/src/data/stops";
+
 
 // Tillat også StopQ fra adapteret (har isCorrect på option, ikke correctId på q)
 import type { StopQ as AdapterStopQ } from "@/src/banks/stopQuizAdapter";
@@ -243,14 +248,41 @@ export default function StopModule(props: StopModuleProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // Gå til neste etappe og lukk overlay
-  function proceedNextEtappe() {
-    try {
-      onNextEtappe?.();
-    } finally {
-      handleExit();
+// Gå til neste etappe og lukk overlay
+// src/partials/StopModule.tsx (Endelig Korrigert Logikk)
+
+// Gå til neste etappe og lukk overlay
+function proceedNextEtappe() {
+  const stops = getStops();
+  const currentStopIndex = stops.findIndex(s => s.id === stopName); // Index av Mandal
+  const nextStop = stops[currentStopIndex + 1]; // Kristiansand
+  const currentStop = stops[currentStopIndex];
+
+  try {
+    if (currentStop && nextStop) {
+      const currentMeters = currentStop.at;
+      const nextMeters = nextStop.at;
+
+      // Legger inn riktig, sekvensiell etappe: (Stopp A) -> (Stopp B)
+      queueStageStart({
+        fromName: currentStop.name, // FRA: Mandal
+        toName: nextStop.name,      // TIL: Kristiansand
+        meters: Math.max(0, nextMeters - currentMeters),
+      });
+      console.log(`[StopModule] Stage queued: ${currentStop.name} -> ${nextStop.name}.`);
+    } else {
+        // Fallback for siste stopp
+        queueStageStart({ fromName: stopName });
     }
+
+    onNextEtappe?.();
+  } catch (e) {
+    console.log("[StopModule] onNextEtappe error", e);
+  } finally {
+    handleExit();
   }
+}
+
 
   function handleExit() {
     cleanupTicker();

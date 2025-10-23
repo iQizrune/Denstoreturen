@@ -333,7 +333,7 @@ if (i >= queue.length || !q) {
           <Image source={displayImage} style={styles.flag} resizeMode="contain" accessible />
           {/* Blur-overlay som fader bort ved reveal */}
           <Animated.View pointerEvents="none" style={[styles.flagOverlay, { opacity: revealFade }]}>
-            <Image source={displayImage} style={styles.flag} resizeMode="contain" blurRadius={20} />
+            <Image source={displayImage} style={styles.flag} resizeMode="contain" blurRadius={30} />
           </Animated.View>
         </View>
       ) : null}

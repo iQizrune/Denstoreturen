@@ -316,7 +316,7 @@ export default function MapViewSvg({
                     d={activePath}
                     fill="none"
                     stroke={COLORS.routeBlue}
-                    strokeWidth={4}
+                    strokeWidth={2.5}
                     vectorEffect="non-scaling-stroke"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -368,7 +368,7 @@ export default function MapViewSvg({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#f5f5f5" },
+  root: { flex: 1, backgroundColor: "#E6EFF5" }, // Endret til en lys, subtil blågrå
   chip: {
     position: "absolute",
     right: 10, top: 12,

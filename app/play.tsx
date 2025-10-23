@@ -1,183 +1,359 @@
-// app/play.tsx
-import React, { useEffect, useState, useMemo } from "react";
-import { View, Pressable, Text } from "react-native";
-import { getStops } from "@/src/state/route";
-import { publishMeters, subscribeMeters } from "@/src/lib/progressBus";
+// app/play.tsx (Reparert og Renset)
+import React, { useState, useMemo, useEffect } from "react";
+import { View, Pressable, Text, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+
+// State og Logikk (Ren import)
 import { addMeters, getTotalMeters } from "@/src/state/run";
+import { getNextStopAtMeters, markStopSeen, advanceAfterStop, getRouteState } from "@/src/state/route";
+import { useArrivedStop } from "@/src/hooks/useArrivedStop";
+import { subscribeMeters, publishMeters } from "@/src/lib/progressBus";
 
-// ⬇️ StopModule + quiz-henter (tilpass evt. stier)
-import StopModule from "../src/partials/StopModule";
-import getStopQuiz from "../src/banks/getStopQuizByer";
-import { useArrivedStop } from "../src/hooks/useArrivedStop";
+// UI/Partials
+import StopModule from "@/src/partials/StopModule";
+import StagePoster from "@/components/posters/StagePoster";
+import IntroPoster from "@/components/posters/IntroPoster";
+import getStopQuiz from "@/src/banks/getStopQuizByer";
+import { takePendingStageStart, StageStartPayload } from "../src/lib/stageQueue";
+
+// Placeholder for nødvendig UI-komponent
+const PlayingPanels = require("@/src/partials/PlayingPanels").default;
+
+// Global sperre: Hindrer at useArrivedStop trigger to ganger
+let suppressAutoStop = false;
+
+// Definerer garantert StageState for å tilfredsstille TypeScript
+type StageState = { 
+    fromName: string; 
+    toName: string; 
+    meters: number;
+};
+type DevPosterId = 'none' | 'trick' | 'bonus' | 'lightning' | 'reveal';
 
 
-// --- lokale typer (enkelt) ---
-type Stop = { id: string; name: string; at: number };
+// --- HOOKS FOR LOKAL HUD ---
+function useHUDStatus() {
+  const [meters, setMeters] = useState(getTotalMeters());
+  const [nextMeters, setNextMeters] = useState(getNextStopAtMeters());
 
-function findNextStopLocal(total: number, stops: Stop[]) {
-  for (let i = 0; i < stops.length; i++) {
-    if (total < stops[i].at) return stops[i];
-  }
-  return null;
+  useEffect(() => {
+    const off = subscribeMeters(({ meters: m }) => {
+      setMeters(m);
+      setNextMeters(getNextStopAtMeters()); 
+    });
+    setNextMeters(getNextStopAtMeters());
+    return off;
+  }, []);
+
+  const routeState = getRouteState();
+  const nextStop = routeState.stops[routeState.nextIndex] || { name: "Kirkenes", at: Infinity };
+  
+  const remaining = Math.max(0, nextMeters - meters);
+  const goalName = nextStop.name;
+  
+  return { meters, remaining, goalName };
 }
 
 export default function PlayScreen() {
-  const [Panel, setPanel] = useState<any>(null);
-  const [meters, setMeters] = useState<number>(getTotalMeters());
-  const [next, setNext] = useState<Stop | null>(null);
-
-  // --- StopModule state ---
+  const router = useRouter();
+  const { meters, remaining, goalName } = useHUDStatus();
   const [stopVisible, setStopVisible] = useState(false);
-  const [stopName, setStopName] = useState<string>("");
+  const [currentStopId, setCurrentStopId] = useState("");
+  const [stagePayload, setStagePayload] = useState<StageState | null>(null);
+  const [devPoster, setDevPoster] = useState<DevPosterId>('none');
 
+
+  // 1. Ankomst: Lytter på meter og navigerer automatisk
   useArrivedStop(({ id }) => {
-    setStopName(id);
+    if (suppressAutoStop) return;
+    
+    setCurrentStopId(id);
     setStopVisible(true);
-    });
+  });
 
-  // last spørrepanelet lazy for å holde appen snappy
+  // 2. Queue-sjekk: Sjekk køen for StagePoster ved mount/fokus
   useEffect(() => {
-    let alive = true;
-    import("@/src/partials/PlayingPanels")
-      .then((m: any) => alive && setPanel(() => m.default || null))
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
+    const p = takePendingStageStart();
+    if (p) {
+      setStagePayload({ 
+        fromName: p.fromName || "Start", 
+        toName: p.toName || "Destinasjon",
+        meters: p.meters || 0 
+      });
+      suppressAutoStop = true;
+    }
   }, []);
 
-  // Oppdater HUD + oppdag ankomst til stopp
-  useEffect(() => {
-    const unsub = subscribeMeters(({ meters: m }) => {
-      setMeters(m);
-      const s = getStops() as Stop[];
-      const nxt = findNextStopLocal(m, s);
-      setNext(nxt);
+  // --- Handlere ---
 
-      // Hvis vi har nådd målet for etappen: vis stopmodule (én gang)
-      if (nxt && m >= nxt.at && !stopVisible) {
-        setStopName(nxt.name);
-        setStopVisible(true);
-      }
-    });
-
-    // init beregning basert på global state (uten å publisere)
-    const s = getStops() as Stop[];
-    const m0 = getTotalMeters();
-    setNext(findNextStopLocal(m0, s));
-
-    return () => unsub?.();
-  }, [stopVisible]);
-
-  // Dev-knapp: hopp til 100 m før neste stopp (riktig måte: oppdater state + publiser)
+  // Dev-knapp: Hopp ELLER vis plakatvelgeren når vi er nær målet
   const devJump = () => {
     const current = getTotalMeters();
-    const s = getStops() as Stop[];
-    const nxt = findNextStopLocal(current, s);
-    if (!nxt) return;
+    const goal = getNextStopAtMeters(); 
+    
+    // Hvis vi er NÆR målet (innen 1000m), vis plakatvelgeren
+    if (goal > current && (goal - current) < 1000) { 
+        setDevPoster('trick'); // Åpne plakatvelgeren med Trick som default
+        return;
+    }
 
-    const target = Math.max(0, nxt.at - 100);
+    // Standard hopp: hopper til 100 m før neste stopp
+    if (!(goal > current)) return;
+
+    const target = Math.max(0, goal - 100);
     const delta = target - current;
-    if (delta <= 0) return;
 
     addMeters(delta);
-    const total = getTotalMeters();
-    setTimeout(() => publishMeters(total), 0);
+    setTimeout(() => publishMeters(getTotalMeters()), 0);
+  };
+  
+  // Kalles når StagePoster lukkes (når spilleren sier "Start quiz")
+  const startNextStageNow = () => {
+    setStagePayload(null);
+    suppressAutoStop = false;
   };
 
-  // Når man fullfører stopmodule
-  const handleStopComplete = () => {
-    // her kan du evt. trigge ny etappe/legge til state, men vi lukker modulen nå
+  // Kalles når StopModule er ferdig (etter byquiz)
+  const handleStopExit = () => {
     setStopVisible(false);
-
-    // Etter å ha lukket modulen, re-beregn neste stopp (kan ha flyttet deg til ny etappe)
-    const s = getStops() as Stop[];
-    const m = getTotalMeters();
-    setNext(findNextStopLocal(m, s));
+    markStopSeen();        
+    advanceAfterStop();    
   };
 
-  const remaining = useMemo(() => (next ? Math.max(0, next.at - meters) : 0), [next, meters]);
+  // === RENDER DEV PLAKATVELGER (Hvor teksten ligger) ===
+  const renderDevPoster = () => {
+    if (devPoster === 'none') return null;
 
-  // Render
+    let title = "";
+    let content: React.ReactNode = null;
+
+    // Hardkodet dummy data for plakatinnhold
+    const dummyData: { from: string; to: string; meters: number } = {
+        from: "Lindesnes Fyr", 
+        to: "Mandal", 
+        meters: 39467 
+    };
+
+    // Logikk for innhold basert på valgt plakat
+    if (devPoster === 'trick') {
+        title = "TRIKS: 'Feil' er Riktig";
+        content = (
+            <>
+                <Text style={styles.devTitle}>{title}</Text>
+                <Text style={styles.devText}>Når du får et spørsmål med bare 3 svaralternativer, da skal du svare feil, for å få meter. Du vinner hele 50 m. Tiden er kort (3s)!</Text>
+            </>
+        );
+    } else if (devPoster === 'bonus') {
+        title = "BONUS: Velg din utfordring";
+        content = (
+            <>
+                <Text style={styles.devTitle}>{title}</Text>
+                <Text style={styles.devText}>Velg mellom lett (20m), middels (50m) eller vanskelig (100m). Du har god tid.</Text>
+            </>
+        );
+    } else if (devPoster === 'lightning') {
+        title = "LYNQUIZ: 15 sekunder";
+        content = (
+            <>
+                <Text style={styles.devTitle}>{title}</Text>
+                <Text style={styles.devText}>Svar riktig på så mange spørsmål du rekker på 15 sekunder for 20m per riktig.</Text>
+            </>
+        );
+    } else if (devPoster === 'reveal') {
+        title = "AVDEKKING: Gjetting er Gull";
+        content = (
+            <>
+                <Text style={styles.devTitle}>{title}</Text>
+                <Text style={styles.devText}>Et tåkelagt bilde avdekkes. Jo raskere du gjetter riktig, jo flere meter (10m/sekund)!</Text>
+            </>
+        );
+    }
+    
+    // Dev-valgknapper
+    const DevButtons = (
+        <View style={styles.devSelectorContainer}>
+            <Text style={styles.devTitle}>Vis Plakat:</Text>
+            {['trick', 'bonus', 'lightning', 'reveal'].map(k => (
+                <Pressable key={k} onPress={() => setDevPoster(k as any)} style={styles.devSelectorBtn}>
+                    <Text style={styles.devSelectorText}>{k.toUpperCase()}</Text>
+                </Pressable>
+            ))}
+            <Pressable onPress={() => setDevPoster('none')} style={styles.devSelectorClose}>
+                <Text style={styles.devSelectorText}>Lukk</Text>
+            </Pressable>
+        </View>
+    );
+
+    return (
+        <View style={styles.posterOverlay}>
+            <IntroPoster 
+                // logoSource={require("@/assets/images/norquiz-logo.png")} // Antatt asset
+                from={dummyData.from}
+                to={dummyData.to}
+                meters={dummyData.meters}
+                onStart={() => setDevPoster('none')} // Simulerer start av quiz
+            >
+                {content}
+                {DevButtons}
+            </IntroPoster>
+        </View>
+    );
+  };
+
+
+  // --- Render ---
+
+  // Vis StagePoster hvis payload er tilgjengelig
+  if (stagePayload) {
+    return (
+      <View style={styles.container}>
+        <StagePoster
+          visible={true}
+          fromName={stagePayload.fromName}
+          toName={stagePayload.toName}
+          meters={stagePayload.meters}
+          onStart={startNextStageNow}
+        />
+      </View>
+    );
+  }
+
+  // Hovedspillvisning
   return (
-    <View style={{ flex: 1, backgroundColor: "#111" }}>
-      {/* HUD */}
-      <View
-        style={{
-          position: "absolute",
-          top: 40,
-          left: 16,
-          right: 16,
-          zIndex: 9999,
-          elevation: 50,
-          backgroundColor: "rgba(17,17,17,0.8)",
-          borderRadius: 12,
-          padding: 10,
-          borderWidth: 1,
-          borderColor: "#333",
-        }}
-        pointerEvents="none"
-      >
-        <Text style={{ color: "#fff", fontWeight: "800", textAlign: "center" }}>
-          {meters} m {next ? `• ${next.name} om ${remaining} m` : ""}
+    <View style={styles.container}>
+      {/* HUD (Status) */}
+      <View style={styles.hud} pointerEvents="none">
+        <Text style={styles.hudText}>
+          {meters} m • {goalName} om {remaining} m
         </Text>
       </View>
 
-      {/* Main-spill: PAUSES når stopmodule er synlig (renderes ikke) */}
+      {/* Main Quiz Area */}
       <View style={{ flex: 1 }}>
-        {!stopVisible && Panel ? <Panel /> : null}
+        {PlayingPanels ? <PlayingPanels /> : <Text style={styles.loadingText}>Laster quiz...</Text>}
       </View>
 
-      {/* Dev-knapp */}
-      <Pressable
-        onPress={devJump}
-        accessibilityRole="button"
-        hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
-        style={{
-          position: "absolute",
-          left: 16,
-          right: 16,
-          bottom: 96,
-          backgroundColor: "#374151",
-          padding: 16,
-          borderRadius: 14,
-          zIndex: 10000,
-          elevation: 60,
-        }}
-      >
-        <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>
-          Dev: hopp til 100 m før neste stopp
-        </Text>
+      {/* Dev-knapp: Hopp ELLER vis plakatvelgeren */}
+      <Pressable onPress={devJump} style={styles.devBtn}>
+        <Text style={styles.devBtnText}>Dev: Hopp til {goalName} (-100 m)</Text>
       </Pressable>
 
-      {/* StopModule-overlay (fullskjerm) */}
-      <StopModule
-        visible={stopVisible}
-        stopName={stopName}
-        // hent 6 spm for stoppet
-        getStopQuiz={(name: string) => {
-          try {
-            return getStopQuiz(name) ?? [];
-          } catch {
-            return [];
-          }
-        }}
-        // evt. wishekort/byvåpen når man klarer alt
-        onAwardByvapen={(city: string) => {
-          // valgfritt: du kan publisere en bus-event her om du har en egen kartBus
-          // publishAwardCoat({ type: "award-coat", stopId: city, perfect: false })
-        }}
-        onOpenMap={() => {
-          // valgfritt: naviger til kart
-        }}
-        onNextEtappe={() => {
-          // valgfritt: hopp direkte til neste etappe
-        }}
-        onComplete={() => {
-          // result: { stopName, correct, total } – kan logges/brukes
-        }}
-        onExit={handleStopComplete}
-      />
+      {/* StopModule-overlay */}
+      {stopVisible && (
+        <StopModule
+          visible={stopVisible}
+          stopName={currentStopId}
+          getStopQuiz={getStopQuiz}
+          onExit={handleStopExit}
+          onAwardByvapen={() => {}}
+          onOpenMap={() => { router.replace('/kart'); }}
+          onNextEtappe={() => {
+            setStopVisible(false); 
+          }}
+          onComplete={() => {}} 
+        />
+      )}
+      
+      {/* Render Dev Plakatvelger (vises over alt annet) */}
+      {renderDevPoster()}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#111",
+  },
+  hud: {
+    position: "absolute",
+    top: 40,
+    left: 16,
+    right: 16,
+    zIndex: 9999,
+    elevation: 50,
+    backgroundColor: "rgba(17,17,17,0.8)",
+    borderRadius: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  hudText: {
+    color: "#fff",
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  devBtn: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    bottom: 40, 
+    backgroundColor: "#374151",
+    padding: 16,
+    borderRadius: 14,
+    zIndex: 10000,
+    elevation: 60,
+  },
+  devBtnText: {
+    color: "white",
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  loadingText: {
+    color: "#ccc",
+    textAlign: "center",
+    marginTop: 100,
+  },
+  // --- NYE STILER FOR DEV POSTER ---
+  posterOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    zIndex: 100000,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  devTitle: {
+    color: '#ccc',
+    fontWeight: 'bold',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  devText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  devSelectorContainer: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: 'rgba(0, 50, 100, 0.2)',
+    borderRadius: 10,
+    alignItems: 'center',
+    gap: 8,
+  },
+  devSelectorBtn: {
+    backgroundColor: '#ffc107',
+    padding: 8,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  devSelectorClose: {
+    marginTop: 10,
+    padding: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  devSelectorText: {
+    color: 'black',
+    fontWeight: 'bold',
+  }
+});

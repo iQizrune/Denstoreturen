@@ -45,14 +45,14 @@ export default function ProfileScreen() {
       </View>
 
       <Pressable
-        onPress={() => { if (!canSave) return; setProfile({ name: name.trim(), age } as any); router.replace('/start'); }}
+        onPress={() => { if (!canSave) return; setProfile({ name: name.trim(), age } as any); router.replace("/pre-etappe"); }}
         disabled={!canSave}
         style={{ opacity: canSave ? 1 : 0.5, backgroundColor: '#10b981', padding: 14, borderRadius: 12, marginTop: 8 }}
       >
         <Text style={{ color: 'white', fontWeight: '800', textAlign: 'center' }}>Lagre og fortsett</Text>
       </Pressable>
 
-      <Pressable onPress={() => router.replace('/start')} style={{ padding: 12 }}>
+      <Pressable onPress={() => router.replace("/pre-etappe")} style={{ padding: 12 }}>
         <Text style={{ color: '#9ca3af', textAlign: 'center' }}>Hopp over</Text>
       </Pressable>
     </View>
