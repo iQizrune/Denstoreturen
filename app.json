@@ -3,7 +3,14 @@
     "name": "iQiz",
     "slug": "iqiz",
     "scheme": "iqiz",
-    "icon": "./assets/images/icon.square.png",
+    "icon": "./assets/images/krikerogkrokerlogo.png",
+
+    "splash": {
+      "image": "./assets/images/krikerogkrokerlogo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#cbe9f5"
+    },
+
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -19,8 +26,8 @@
         }
       },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.square.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/krikerogkrokerlogo.png",
+        "backgroundColor": "#cbe9f5"
       }
     },
     "plugins": [

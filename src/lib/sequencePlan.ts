@@ -1,0 +1,23 @@
+// src/lib/sequencePlan.ts
+export type Kind = "core" | "flags" | "bonus" | "reveal" | "trick" | "lightning" | "extralife";
+
+export function categoryFor(index1: number): Kind {
+  // index1 er 1-basert: 1,2,3,...
+  const n = Math.max(1, Math.floor(index1));
+
+  const isFlags = n >= 4 && (n - 4) % 10 === 0;          // 4,14,24,34,...
+  const isBonus = n >= 8 && (n - 8) % 10 === 0;          // 8,18,28,38,...
+  const isReveal = n % 15 === 0;                          // 15,30,45,60,...
+  const isTrick = n >= 17 && (n === 17 || (n - 17) % 20 === 0); // 17,37,57,77,...
+  const isLightning = n % 12 === 0;                       // 12,24,36,48,...
+  const isExtralife = n >= 20 && (n - 20) % 50 === 0;     // 20,70,120,...
+
+  // Kollisjonshåndtering (prioritet høy → lav):
+  if (isExtralife) return "extralife";
+  if (isLightning) return "lightning";
+  if (isReveal) return "reveal";
+  if (isTrick) return "trick";
+  if (isBonus) return "bonus";
+  if (isFlags) return "flags";
+  return "core";
+}

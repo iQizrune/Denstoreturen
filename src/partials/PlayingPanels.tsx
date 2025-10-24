@@ -13,7 +13,7 @@ import {
   Animated,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { categoryFor } from "@/src/lib/sequencePlan"; // legg til denne
 import { buildQuizPool } from "@/src/banks/buildQuizPool";
 import { FLAGS_ASSETS } from "@/src/banks/flagsAssets";
 import { REVEAL_ASSETS } from "@/src/banks/revealAssets";
@@ -25,7 +25,6 @@ import { publishMeters, subscribeMeters } from "@/src/lib/progressBus";
 const DEBUG = false;
 const HEADER_ESTIMATE = 96;
 const BOTTOM_ESTIMATE = 40;
-const ROUND_SIZE = 12;
 const SEED = "runde-1";
 const AUTONEXT_MS = 650;
 const REVEAL_MS = 10000;
@@ -63,50 +62,76 @@ export default function PlayingPanels() {
 
   // Bygg spørsmåls-kø
   const queue: QA[] = useMemo(() => {
-    const managed = buildQuizPool({
-      enabled: {
-        core: true,
-        flags: true,
-        trick: true,
-        bonus: true,
-        reveal: true,
-        lightning: true,
-        extralife: true,
-      },
-      weights: { core: 3, flags: 2, trick: 1, bonus: 1, reveal: 1, lightning: 1, extralife: 1 },
-      maxTotal: 300,
-      seed: SEED,
-      shuffleOptions: true,
-    });
+  const managed = buildQuizPool({
+    enabled: {
+      core: true, flags: true, trick: true, bonus: true, reveal: true, lightning: true, extralife: true,
+    },
+    // weights beholdes for bakoverkompabilitet
+    weights: { core: 3, flags: 2, trick: 1, bonus: 1, reveal: 1, lightning: 1, extralife: 1 },
+    maxTotal: 300,
+    seed: SEED,
+    shuffleOptions: true,
+  });
 
-    if (DEBUG) console.log("[PlayingPanels] managed total =", managed.length);
+  const base: QA[] = managed.map((q: any) => ({
+    id: q.id,
+    text: q.text,
+    options: q.options.map((o: any) => ({ id: o.id, label: o.label, isCorrect: q?.correctId === o?.id })),
+    correctId: q.correctId,
+    meta: q.meta || {},
+    image: q.image,
+  }));
 
-    const base: QA[] = managed.map((q: any) => ({
-      id: q.id,
-      text: q.text,
-      options: q.options.map((o: any) => ({
-        id: o.id,
-        label: o.label,
-        isCorrect: q?.correctId === o?.id,
-      })),
-      correctId: q.correctId,
-      meta: q.meta || {},
-      image: q.image,
-    }));
+  if (!base.length) {
+    if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
+    return [];
+  }
 
-    if (!base.length) {
-      if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
-      return [];
+  // --- NY LOGIKK: bygg sekvens etter plan, ingen hard begrensning ---
+  // (forutsetter at du har lagt til importen av categoryFor øverst)
+  const pools: Record<string, QA[]> = {
+    core: [], flags: [], bonus: [], reveal: [], trick: [], lightning: [], extralife: [],
+  };
+  for (const q of base) {
+    const kind = (q?.meta?.kind as string) || "core";
+    (pools[kind] ?? pools.core).push(q);
+  }
+
+  // pekere i hver kategori
+  const idx: Record<string, number> = {
+    core: 0, flags: 0, bonus: 0, reveal: 0, trick: 0, lightning: 0, extralife: 0,
+  };
+
+  const take = (kind: string): QA | null => {
+    const p = pools[kind];
+    if (!p || idx[kind] >= p.length) return null;
+    const item = p[idx[kind]];
+    idx[kind] += 1;
+    return item;
+  };
+
+  const takeFallback = (): QA | null => {
+    // fallbackrekkefølge hvis ønsket kategori er tom
+    const order = ["core", "flags", "bonus", "reveal", "trick", "lightning", "extralife"];
+    for (const k of order) {
+      const got = take(k);
+      if (got) return got;
     }
+    return null;
+  };
 
-    let bag: QA[] = [];
-    while (bag.length < ROUND_SIZE) {
-      bag = bag.concat(shuffle(base));
-      if (bag.length > ROUND_SIZE * 3) break;
-    }
-    bag = bag.slice(0, ROUND_SIZE);
-    return shuffle(bag);
-  }, []);
+  // bygg hele sekvensen deterministisk etter plan
+  const planLen = base.length; // bruk alle tilgjengelige spørsmål
+  const out: QA[] = [];
+  for (let i = 1; i <= planLen; i++) {
+    const target = categoryFor(i);  // <-- kommer fra importen du legger inn
+    const picked = take(target) || takeFallback();
+    if (picked) out.push(picked); else break;
+  }
+
+  return out;
+}, []);
+
 
   const [i, setI] = useState(0);
   const [locked, setLocked] = useState(false);
