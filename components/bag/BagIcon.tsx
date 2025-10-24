@@ -1,7 +1,7 @@
 // components/bag/BagIcon.tsx
 import React from "react";
 import { Image, View, Text } from "react-native";
-import { COAT_IMAGES } from "../../src/coat_images";
+import { COAT_IMAGES } from "@/src/data/coat_images";
 
 function slugify(s?: string) {
   const raw = String(s ?? "")
