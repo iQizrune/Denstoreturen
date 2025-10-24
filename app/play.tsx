@@ -131,12 +131,14 @@ export default function PlayScreen() {
     let title = "";
     let content: React.ReactNode = null;
 
-    // Hardkodet dummy data for plakatinnhold
-    const dummyData: { from: string; to: string; meters: number } = {
-        from: "Lindesnes Fyr", 
-        to: "Mandal", 
-        meters: 39467 
-    };
+    // Ekte rutedata for plakat (ingen hardkode)
+    const rs = getRouteState();
+    const fromNameDev = rs.stops[Math.max(0, (rs.nextIndex ?? 1) - 1)]?.name ?? "Start";
+    const toNameDev   = rs.stops[rs.nextIndex ?? 1]?.name ?? "Mål";
+    const currentDev  = getTotalMeters();
+    const goalDev     = getNextStopAtMeters();
+    const metersDev   = Math.max(0, goalDev - currentDev);
+
 
     // Logikk for innhold basert på valgt plakat
     if (devPoster === 'trick') {
@@ -192,9 +194,9 @@ export default function PlayScreen() {
         <View style={styles.posterOverlay}>
             <IntroPoster 
                 // logoSource={require("@/assets/images/norquiz-logo.png")} // Antatt asset
-                from={dummyData.from}
-                to={dummyData.to}
-                meters={dummyData.meters}
+                from={fromNameDev}
+                to={toNameDev}
+                meters={metersDev}
                 onStart={() => setDevPoster('none')} // Simulerer start av quiz
             >
                 {content}
