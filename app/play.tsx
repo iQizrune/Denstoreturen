@@ -61,6 +61,9 @@ export default function PlayScreen() {
   const [currentStopId, setCurrentStopId] = useState("");
   const [stagePayload, setStagePayload] = useState<StageState | null>(null);
   const [devPoster, setDevPoster] = useState<DevPosterId>('none');
+  const [roundSeed, setRoundSeed] = useState(0);
+  
+
 
 
   // 1. Ankomst: Lytter på meter og navigerer automatisk
@@ -117,7 +120,8 @@ export default function PlayScreen() {
   const handleStopExit = () => {
     setStopVisible(false);
     markStopSeen();        
-    advanceAfterStop();    
+    advanceAfterStop();
+    setRoundSeed(s => s + 1);    
   };
 
   // === RENDER DEV PLAKATVELGER (Hvor teksten ligger) ===
@@ -230,7 +234,7 @@ export default function PlayScreen() {
 
       {/* Main Quiz Area */}
       <View style={{ flex: 1 }}>
-        {PlayingPanels ? <PlayingPanels /> : <Text style={styles.loadingText}>Laster quiz...</Text>}
+        {PlayingPanels ? <PlayingPanels roundSeed={roundSeed} /> : <Text style={styles.loadingText}>Laster quiz...</Text>}
       </View>
 
       {/* Dev-knapp: Hopp ELLER vis plakatvelgeren */}

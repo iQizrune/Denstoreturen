@@ -1,0 +1,66 @@
+=== APP TREE ===
+app
+app/(game)
+app/(intro)
+app/(intro)/info
+
+app/_layout.tsx
+app/(game)/pre-etappe.tsx
+app/(intro)/info/1.tsx
+app/(intro)/info/2.tsx
+app/+not-found.tsx
+app/index.tsx
+app/kart.tsx
+app/play.tsx
+app/profile.tsx
+app/results.tsx
+app/start.tsx
+app/stop.tsx
+
+=== ROUTES (Expo Router) ===
+app/_layout.tsx
+app/(game)/pre-etappe.tsx
+app/(intro)/info/1.tsx
+app/(intro)/info/2.tsx
+app/+not-found.tsx
+app/index.tsx
+app/kart.tsx
+app/play.tsx
+app/profile.tsx
+app/results.tsx
+app/start.tsx
+app/stop.tsx
+
+=== STATE ===
+total 32
+drwxr-xr-x@  6 runeandersen  staff   192 Oct 24 17:26 .
+drwxr-xr-x  20 runeandersen  staff   640 Oct 24 19:31 ..
+-rw-r--r--@  1 runeandersen  staff   409 Oct 15 22:50 profile.ts
+-rw-r--r--@  1 runeandersen  staff  1591 Oct 22 22:46 route.ts
+-rw-r--r--@  1 runeandersen  staff   212 Oct 15 22:40 run.ts
+-rw-r--r--@  1 runeandersen  staff   393 Oct 24 17:26 storageKeys.ts
+
+=== PARTIALS / FEATURES / ENGINE ===
+src/features
+src/engine
+src/partials
+src/engine/conductor.ts
+src/engine/index.ts
+src/engine/types.ts
+src/features/stop/StopPanel.tsx
+src/partials/PlayingPanels.tsx
+src/partials/StopModule.tsx
+src/partials/TimeBar.tsx
+
+=== COMPONENTS (top-level) ===
+components/bag/BagIcon.tsx
+components/bag/BagPanel.tsx
+components/bag/bagStore.ts
+components/map/MapViewHybrid.tsx
+components/posters/ArrivalPoster.tsx
+components/posters/IntroPoster.tsx
+components/posters/StagePoster.tsx
+components/ThemedText.tsx
+components/ThemedView.tsx
+components/ui/IconSymbol.tsx
+components/ui/TabBarBackground.tsx

@@ -13,7 +13,8 @@ import {
   Animated,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { categoryFor } from "@/src/lib/sequencePlan"; // legg til denne
+
+import { categoryFor } from "@/src/lib/sequencePlan";
 import { buildQuizPool } from "@/src/banks/buildQuizPool";
 import { FLAGS_ASSETS } from "@/src/banks/flagsAssets";
 import { REVEAL_ASSETS } from "@/src/banks/revealAssets";
@@ -43,95 +44,106 @@ type QA = {
   meta?: any;
 };
 
-/** ========= Utils ========= */
-function shuffle<T>(arr: T[]): T[] {
-  const out = arr.slice();
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-export default function PlayingPanels() {
+export default function PlayingPanels({ roundSeed = 0 }: { roundSeed?: number }) {
   const insets = useSafeAreaInsets();
   const { height: winH } = useWindowDimensions();
 
   const padTop = Math.round(insets.top + HEADER_ESTIMATE);
   const padBottom = Math.round(insets.bottom + BOTTOM_ESTIMATE);
 
-  // Bygg spørsmåls-kø
-  const queue: QA[] = useMemo(() => {
-  const managed = buildQuizPool({
-    enabled: {
-      core: true, flags: true, trick: true, bonus: true, reveal: true, lightning: true, extralife: true,
-    },
-    // weights beholdes for bakoverkompabilitet
-    weights: { core: 3, flags: 2, trick: 1, bonus: 1, reveal: 1, lightning: 1, extralife: 1 },
-    maxTotal: 300,
-    seed: SEED,
-    shuffleOptions: true,
-  });
+  // Bygg hele spørsmåls-køen i riktig kategori-rekkefølge for denne runden/etappen
+  const queue = useMemo<QA[]>(() => {
+    const managed = buildQuizPool({
+      enabled: {
+        core: true,
+        flags: true,
+        trick: true,
+        bonus: true,
+        reveal: true,
+        lightning: true,
+        extralife: true,
+      },
+      // weights beholdes for bakoverkompabilitet – rekkefølgen styres av categoryFor
+      weights: { core: 3, flags: 2, trick: 1, bonus: 1, reveal: 1, lightning: 1, extralife: 1 },
+      maxTotal: 300,
+      seed: SEED,
+      shuffleOptions: true,
+    });
 
-  const base: QA[] = managed.map((q: any) => ({
-    id: q.id,
-    text: q.text,
-    options: q.options.map((o: any) => ({ id: o.id, label: o.label, isCorrect: q?.correctId === o?.id })),
-    correctId: q.correctId,
-    meta: q.meta || {},
-    image: q.image,
-  }));
+    const base: QA[] = managed.map((q: any) => ({
+      id: q.id,
+      text: q.text,
+      options: q.options.map((o: any) => ({
+        id: o.id,
+        label: o.label,
+        isCorrect: q?.correctId === o?.id,
+      })),
+      correctId: q.correctId,
+      meta: q.meta || {},
+      image: q.image,
+    }));
 
-  if (!base.length) {
-    if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
-    return [];
-  }
-
-  // --- NY LOGIKK: bygg sekvens etter plan, ingen hard begrensning ---
-  // (forutsetter at du har lagt til importen av categoryFor øverst)
-  const pools: Record<string, QA[]> = {
-    core: [], flags: [], bonus: [], reveal: [], trick: [], lightning: [], extralife: [],
-  };
-  for (const q of base) {
-    const kind = (q?.meta?.kind as string) || "core";
-    (pools[kind] ?? pools.core).push(q);
-  }
-
-  // pekere i hver kategori
-  const idx: Record<string, number> = {
-    core: 0, flags: 0, bonus: 0, reveal: 0, trick: 0, lightning: 0, extralife: 0,
-  };
-
-  const take = (kind: string): QA | null => {
-    const p = pools[kind];
-    if (!p || idx[kind] >= p.length) return null;
-    const item = p[idx[kind]];
-    idx[kind] += 1;
-    return item;
-  };
-
-  const takeFallback = (): QA | null => {
-    // fallbackrekkefølge hvis ønsket kategori er tom
-    const order = ["core", "flags", "bonus", "reveal", "trick", "lightning", "extralife"];
-    for (const k of order) {
-      const got = take(k);
-      if (got) return got;
+    if (!base.length) {
+      if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
+      return [];
     }
-    return null;
-  };
 
-  // bygg hele sekvensen deterministisk etter plan
-  const planLen = base.length; // bruk alle tilgjengelige spørsmål
-  const out: QA[] = [];
-  for (let i = 1; i <= planLen; i++) {
-    const target = categoryFor(i);  // <-- kommer fra importen du legger inn
-    const picked = take(target) || takeFallback();
-    if (picked) out.push(picked); else break;
-  }
+    // Pool pr. kategori
+    const pools: Record<string, QA[]> = {
+      core: [],
+      flags: [],
+      bonus: [],
+      reveal: [],
+      trick: [],
+      lightning: [],
+      extralife: [],
+    };
+    for (const q of base) {
+      const kind = (q?.meta?.kind as string) || "core";
+      (pools[kind] ?? pools.core).push(q);
+    }
 
-  return out;
-}, []);
+    // Pekere i hver kategori
+    const idx: Record<string, number> = {
+      core: 0,
+      flags: 0,
+      bonus: 0,
+      reveal: 0,
+      trick: 0,
+      lightning: 0,
+      extralife: 0,
+    };
 
+    const take = (kind: string): QA | null => {
+      const p = pools[kind];
+      if (!p || idx[kind] >= p.length) return null;
+      const item = p[idx[kind]];
+      idx[kind] += 1;
+      return item;
+    };
+
+    const takeFallback = (): QA | null => {
+      // fallbackrekkefølge hvis ønsket kategori er tom
+      const order = ["core", "flags", "bonus", "reveal", "trick", "lightning", "extralife"];
+      for (const k of order) {
+        const got = take(k);
+        if (got) return got;
+      }
+      return null;
+    };
+
+    // Bygg deterministisk sekvens etter plan (1-basert indeks)
+    const planLen = base.length; // bruk alle tilgjengelige spørsmål
+    const out: QA[] = [];
+    for (let i = 1; i <= planLen; i++) {
+      const target = categoryFor(i);
+      const picked = take(target) || takeFallback();
+      if (picked) out.push(picked);
+      else break;
+    }
+
+    return out;
+  }, [roundSeed]);
 
   const [i, setI] = useState(0);
   const [locked, setLocked] = useState(false);
@@ -194,29 +206,29 @@ export default function PlayingPanels() {
   // Sync lokal visning med bus (HUD) ved eksterne endringer (dev-knapp)
   useEffect(() => {
     const unsub = subscribeMeters(({ meters }) => {
-     setMeters(meters);
-   });
-   return unsub;
+      setMeters(meters);
+    });
+    return unsub;
   }, []);
-  
-  if (!queue.length) {
-  return (
-    <View style={[styles.center, { paddingTop: padTop, paddingBottom: padBottom }]}>
-      <Text style={styles.empty}>Ingen spørsmål tilgjengelig.</Text>
-      <Text style={styles.hint}>Sjekk at minst én kategori er aktiv og at assets er på plass.</Text>
-    </View>
-  );
-}
 
-// ← VIKTIG: ferdig-guard før vi bruker `q`
-if (i >= queue.length || !q) {
-  return (
-    <View style={[styles.center, { paddingTop: padTop, paddingBottom: padBottom }]}>
-      <Text style={styles.title}>Runde ferdig</Text>
-      <Text style={styles.sub}>Meter: {meters} m</Text>
-    </View>
-  );
-}
+  if (!queue.length) {
+    return (
+      <View style={[styles.center, { paddingTop: padTop, paddingBottom: padBottom }]}>
+        <Text style={styles.empty}>Ingen spørsmål tilgjengelig.</Text>
+        <Text style={styles.hint}>Sjekk at minst én kategori er aktiv og at assets er på plass.</Text>
+      </View>
+    );
+  }
+
+  // ← VIKTIG: ferdig-guard før vi bruker `q`
+  if (i >= queue.length || !q) {
+    return (
+      <View style={[styles.center, { paddingTop: padTop, paddingBottom: padBottom }]}>
+        <Text style={styles.title}>Runde ferdig</Text>
+        <Text style={styles.sub}>Meter: {meters} m</Text>
+      </View>
+    );
+  }
 
   function onNext() {
     if (i + 1 < queue.length) {
@@ -239,7 +251,7 @@ if (i >= queue.length || !q) {
     if (kind === "core" || kind === "flags") {
       delta = isCorrect ? 10 : 0;
     } else if (kind === "bonus") {
-      const d = (q?.meta?.difficulty || q?.meta?.level || "easy").toString().toLowerCase();
+      const d = (q?.meta?.difficulty || (q?.meta?.level ?? "easy")).toString().toLowerCase();
       const bonusMap: Record<string, number> = { easy: 10, medium: 50, hard: 100 };
       delta = isCorrect ? (bonusMap[d] ?? 10) : 0;
     } else if (kind === "lightning") {
@@ -276,7 +288,8 @@ if (i >= queue.length || !q) {
   }
 
   // ---- Bildeoppslag ----
-  const code = (q as any)?.meta?.code ?? (q as any)?.meta?.key ?? (q as any)?.code ?? "";
+  const code =
+    (q as any)?.meta?.code ?? (q as any)?.meta?.key ?? (q as any)?.code ?? "";
   const assetFromCode =
     typeof code === "string" ? FLAGS_ASSETS[(code as string).toLowerCase()] : undefined;
 
