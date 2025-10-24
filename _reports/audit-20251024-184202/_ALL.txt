@@ -1,0 +1,131 @@
+
+===== 00_git.txt =====
+
+=== GIT STATUS
+?? _reports/
+?? src/state/storageKeys.ts
+chore/state-audit
+
+===== 01_tsc.txt =====
+
+=== TYPESCRIPT CHECK
+
+===== 02_routes.txt =====
+
+=== APP ROUTES (expo-router)
+app/_layout.tsx
+app/(game)/pre-etappe.tsx
+app/(intro)/info/1.tsx
+app/(intro)/info/2.tsx
+app/+not-found.tsx
+app/index.tsx
+app/kart.tsx
+app/play.tsx
+app/profile.tsx
+app/results.tsx
+app/start.tsx
+app/stop.tsx
+
+===== 03_state.txt =====
+
+=== STATE MODULER
+total 32
+drwxr-xr-x@  6 runeandersen  staff   192 Oct 24 17:26 .
+drwxr-xr-x  21 runeandersen  staff   672 Oct 24 17:11 ..
+-rw-r--r--@  1 runeandersen  staff   409 Oct 15 22:50 profile.ts
+-rw-r--r--@  1 runeandersen  staff  1591 Oct 22 22:46 route.ts
+-rw-r--r--@  1 runeandersen  staff   212 Oct 15 22:40 run.ts
+-rw-r--r--@  1 runeandersen  staff   393 Oct 24 17:26 storageKeys.ts
+
+app/start.tsx:4:import { getProfile } from '@/src/state/profile';
+app/profile.tsx:5:import { getProfile, setProfile, updateProfile, type Profile } from "@/src/state/profile";
+src/partials/StopModule.tsx:15:import { getStops } from "@/src/state/route";
+app/play.tsx:7:import { addMeters, getTotalMeters } from "@/src/state/run";
+app/play.tsx:8:import { getNextStopAtMeters, markStopSeen, advanceAfterStop, getRouteState } from "@/src/state/route";
+app/results.tsx:4:import { addMeters, getTotalMeters } from '@/src/state/run';
+app/stop.tsx:6:import { markStopSeen, advanceAfterStop, getCurrentStop } from '@/src/state/route';
+app/(intro)/info/1.tsx:5:import { getProfile } from "@/src/state/profile";
+src/partials/PlayingPanels.tsx:20:import { addMeters, getTotalMeters } from "@/src/state/run";
+src/features/stop/StopPanel.tsx:4:import { getProfile } from '@/src/state/profile';
+src/features/stop/StopPanel.tsx:5:import { getCurrentStop } from '@/src/state/route';
+src/engine/conductor.ts:1:import { getTotalMeters } from '@/src/state/run';
+src/engine/conductor.ts:2:import { getRouteState } from '@/src/state/route';
+
+===== 04_components.txt =====
+
+=== KOMPONENTER (øverste nivå)
+components/bag/BagIcon.tsx
+components/bag/BagPanel.tsx
+components/bag/bagStore.ts
+components/map/MapViewHybrid.tsx
+components/posters/ArrivalPoster.tsx
+components/posters/IntroPoster.tsx
+components/posters/StagePoster.tsx
+components/ThemedText.tsx
+components/ThemedView.tsx
+components/ui/IconSymbol.tsx
+components/ui/TabBarBackground.tsx
+
+===== 05_partials_features.txt =====
+
+=== PARTIALS / FEATURES
+src/features
+src/partials
+src/partials/StopModule.tsx:65:export default function StopModule(props: StopModuleProps) {
+src/features/stop/StopPanel.tsx:9:export default function StopPanel({ onComplete }: { onComplete: () => void }) {
+src/partials/TimeBar.tsx:15:export default function TimeBar({
+src/partials/PlayingPanels.tsx:56:export default function PlayingPanels() {
+
+===== 06_storage_scan.txt =====
+
+=== SØK: AsyncStorage / lagring
+src/state/storageKeys.ts:2:// Felles navnerom for alle AsyncStorage-nøkler i appen.
+
+===== 07_todos.txt =====
+
+=== SØK: TODO / FIXME / HACK
+src/partials/StopModule.tsx:387:                    const hadCorrectTool = true; // TODO: sjekk bag
+app/kart.tsx:90:        getStopQuiz={(name:string) => [] /* TODO: koble til ekte quizadapter senere */}
+src/banks/cityAdapter.ts:5:  // TODO: Bytt til ekte by-spørsmål senere
+
+===== 08_console.txt =====
+
+=== SØK: console.log
+src/partials/StopModule.tsx:272:      console.log(`[StopModule] Stage queued: ${currentStop.name} -> ${nextStop.name}.`);
+src/partials/StopModule.tsx:280:    console.log("[StopModule] onNextEtappe error", e);
+src/partials/PlayingPanels.tsx:86:    if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
+src/partials/PlayingPanels.tsx:293:    console.log("[PlayingPanels] q", {
+src/banks/flagsAdapter.ts:88:  console.log("[flagsAdapter] items from module:", items.length);
+src/banks/flagsAdapter.ts:140:  console.log("[flagsAdapter] items from assets:", entries.length);
+src/lib/stageBus.ts:13:  console.log("[stageBus] publishStageStart", payload);
+src/lib/stageQueue.ts:14:    try { console.log("[stageQueue] queued", payload); } catch {}
+src/lib/stageQueue.ts:22:    try { console.log("[stageQueue] taken", p); } catch {}
+
+===== 09_unused_ts.txt =====
+
+=== MULIG UBRUKTE .ts/.tsx (heuristikk)
+src/ui/PrimaryButton.tsx
+src/ui/UiText.tsx
+src/state/storageKeys.ts
+src/coat_images.ts
+src/map/react-native-maps.web.ts
+src/map/projection.ts
+src/map/mapUtils.ts
+src/theme/theme.ts
+src/data/coat_images.ts
+src/data/routeNodes.ts
+app/+not-found.tsx
+
+===== 10_unused_assets.txt =====
+
+=== ASSETS som kanskje ikke refereres
+assets/images/krikerogkrokerlogo.png
+
+===== 11_gitlog.txt =====
+
+=== ENDRINGSLOGG: siste 5 commits
+9af1c718 chore(cleanup): fjern tom src/storage-mappe
+068aaba9 chore(archive): flytt ubrukt storage/profile.ts
+0970c517 chore(archive): flytt gammel intro-flow til _archive/2025-10-24-intro
+d9f369b1 docs(archive): legg til README i _archive/2025-10-23-unused
+4f608f23 chore(archive): flytt ubrukte filer/assets til _archive/2025-10-23-unused

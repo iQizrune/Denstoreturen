@@ -1,0 +1,2 @@
+=== SØK: AsyncStorage / lagring
+src/state/storageKeys.ts:2:// Felles navnerom for alle AsyncStorage-nøkler i appen.

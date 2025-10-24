@@ -1,0 +1,12 @@
+=== KOMPONENTER (øverste nivå)
+components/bag/BagIcon.tsx
+components/bag/BagPanel.tsx
+components/bag/bagStore.ts
+components/map/MapViewHybrid.tsx
+components/posters/ArrivalPoster.tsx
+components/posters/IntroPoster.tsx
+components/posters/StagePoster.tsx
+components/ThemedText.tsx
+components/ThemedView.tsx
+components/ui/IconSymbol.tsx
+components/ui/TabBarBackground.tsx

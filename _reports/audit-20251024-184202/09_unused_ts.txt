@@ -1,0 +1,12 @@
+=== MULIG UBRUKTE .ts/.tsx (heuristikk)
+src/ui/PrimaryButton.tsx
+src/ui/UiText.tsx
+src/state/storageKeys.ts
+src/coat_images.ts
+src/map/react-native-maps.web.ts
+src/map/projection.ts
+src/map/mapUtils.ts
+src/theme/theme.ts
+src/data/coat_images.ts
+src/data/routeNodes.ts
+app/+not-found.tsx

@@ -1,0 +1,6 @@
+=== ENDRINGSLOGG: siste 5 commits
+9af1c718 chore(cleanup): fjern tom src/storage-mappe
+068aaba9 chore(archive): flytt ubrukt storage/profile.ts
+0970c517 chore(archive): flytt gammel intro-flow til _archive/2025-10-24-intro
+d9f369b1 docs(archive): legg til README i _archive/2025-10-23-unused
+4f608f23 chore(archive): flytt ubrukte filer/assets til _archive/2025-10-23-unused

@@ -1,0 +1,2 @@
+=== ASSETS som kanskje ikke refereres
+assets/images/krikerogkrokerlogo.png
