@@ -16,7 +16,7 @@ export default function StagePoster({ visible, fromName, toName, meters, etappeN
   return (
     <View style={styles.wrap} pointerEvents="auto">
       <View style={styles.card}>
-        <Text style={styles.heading}>{etappeNo ? `Etappe ${etappeNo}` : "Neste etappe"}</Text>
+        <Text style={styles.heading}>{etappeNo ? `Etappe ` : 'Neste etappe'}</Text>
         <Text style={styles.route}>{fromName} → {toName}</Text>
         <Text style={styles.distance}>{meters.toLocaleString('no-NO')} m</Text>
 

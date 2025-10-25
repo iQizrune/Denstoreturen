@@ -14,27 +14,91 @@ export default function Info1() {
     else router.push("/profile");
   };
 
+  const onOpenMap = () => {
+    try {
+      const Haptics = require("expo-haptics");
+      Haptics?.impactAsync?.(Haptics?.ImpactFeedbackStyle?.Medium ?? 1);
+    } catch (_) {}
+    router.push("/kart");
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: "#0b132b", padding: 24, justifyContent: "center", gap: 12 }}>
-      <Text style={{ color: "white", fontSize: 24, fontWeight: "800", textAlign: "center", marginBottom: 8 }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#0b132b",
+        padding: 24,
+        justifyContent: "center",
+        gap: 12,
+      }}
+    >
+      <Text
+        style={{
+          color: "white",
+          fontSize: 24,
+          fontWeight: "800",
+          textAlign: "center",
+          marginBottom: 8,
+        }}
+      >
         Velkommen!
       </Text>
+
       <Text style={{ color: "#cbd5e1", fontSize: 16, textAlign: "center" }}>
         Dette er infosiden ved oppstart. Trykk Fortsett for å komme i gang.
       </Text>
 
+      {/* Fortsett-knapp */}
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Fortsett"
         onPress={onContinue}
-        style={{ marginTop: 16, backgroundColor: "#2563eb", borderRadius: 12, padding: 14 }}
+        style={{
+          marginTop: 16,
+          backgroundColor: "#2563eb",
+          borderRadius: 12,
+          padding: 14,
+        }}
       >
-        <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>
+        <Text
+          style={{
+            color: "white",
+            fontWeight: "800",
+            textAlign: "center",
+          }}
+        >
           Fortsett
         </Text>
       </Pressable>
 
       <Text style={{ color: "#9ca3af", textAlign: "center", marginTop: 6 }}>
-        {hasProfile ? `Profil funnet (${p.name}) – går til neste infoside.` : "Nytt spill – vi spør etter profil først."}
+        {hasProfile
+          ? `Profil funnet (${p.name}) – går til neste infoside.`
+          : "Nytt spill – vi spør etter profil først."}
       </Text>
+
+      {/* Åpne kart-knapp */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Åpne kart"
+        onPress={onOpenMap}
+        style={{
+          marginTop: 16,
+          padding: 12,
+          borderRadius: 12,
+          backgroundColor: "#334155",
+        }}
+      >
+        <Text
+          style={{
+            color: "#fff",
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          Åpne kart
+        </Text>
+      </Pressable>
     </View>
   );
 }

@@ -1,0 +1,50 @@
+// app/(intro)/info/1.tsx
+import React from "react";
+import { View, Text, Pressable } from "react-native";
+import { useRouter } from "expo-router";
+import { getProfile } from "@/src/state/profile";
+
+export default function Info1() {
+  const router = useRouter();
+  const p: any = getProfile?.() || { name: "" };
+  const hasProfile = !!(p?.name && String(p.name).trim().length > 0);
+
+  const onContinue = () => {
+    if (hasProfile) router.replace("/info/2");
+    else router.push("/profile");
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "#0b132b", padding: 24, justifyContent: "center", gap: 12 }}>
+      <Text style={{ color: "white", fontSize: 24, fontWeight: "800", textAlign: "center", marginBottom: 8 }}>
+        Velkommen!
+      </Text>
+      <Text style={{ color: "#cbd5e1", fontSize: 16, textAlign: "center" }}>
+        Dette er infosiden ved oppstart. Trykk Fortsett for å komme i gang.
+      </Text>
+
+      <Pressable
+        onPress={onContinue}
+        style={{ marginTop: 16, backgroundColor: "#2563eb", borderRadius: 12, padding: 14 }}
+      >
+        <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>
+          Fortsett
+        </Text>
+      </Pressable>
+
+      <Text style={{ color: "#9ca3af", textAlign: "center", marginTop: 6 }}>
+        {hasProfile ? `Profil funnet (${p.name}) – går til neste infoside.` : "Nytt spill – vi spør etter profil først."}
+      </Text>
+    
+      
+  <Pressable onPress={() => router.push('/kart')} style={{marginTop:16, padding:12, borderRadius:12, backgroundColor:'#334155'}}>
+
+        <Text style={{color:'#fff', fontWeight:'700', textAlign:'center'}}>Åpne kart</Text>
+
+      </Pressable>
+
+    </View>
+  );
+}
+
+  

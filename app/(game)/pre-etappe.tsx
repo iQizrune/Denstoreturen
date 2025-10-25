@@ -1,36 +1,43 @@
 // app/(game)/pre-etappe.tsx
+
 import React from "react";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
-const ETAPPE1_PATH = "/play"; // Endre hvis etappe 1-plakaten din har en annen path
+import { getStops, getRouteState } from "@/src/state/route";
+import StagePoster from "@/components/posters/StagePoster";
 
-export default function PreEtappeScreen() {
-  const goToMap = () => {
-    router.push({ pathname: "/kart", params: { returnTo: "/pre-etappe" } });
-  };
+export default function PreEtappe() {
+  // Avled neste etappe fra rute-state
+  const rs = getRouteState();
+  const stops = getStops();
+  const etappeNo = rs?.nextIndex ?? 1;
 
-  const goToEtappe1 = () => {
-    router.replace(ETAPPE1_PATH);
+  const fromName =
+    stops[Math.max(0, etappeNo - 1)]?.name ?? "Start";
+  const toName =
+    stops[etappeNo]?.name ?? "Mål";
+  const legMeters = Math.max(
+    0,
+    (stops[etappeNo]?.at ?? 0) - (stops[Math.max(0, etappeNo - 1)]?.at ?? 0)
+  );
+
+  // Start etappe → gå til /play
+  const startEtappe = () => {
+    router.replace("/play");
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Text style={styles.title}>Mellom-plakat</Text>
-        <Text style={styles.subtitle}>
-          Her kommer mer innhold etter hvert (introduksjon, tips, regler, m.m.).
-        </Text>
-
-        <View style={styles.buttons}>
-          <TouchableOpacity accessibilityRole="button" style={styles.primaryBtn} onPress={goToMap}>
-            <Text style={styles.primaryText}>Åpne kart</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity accessibilityRole="button" style={styles.secondaryBtn} onPress={goToEtappe1}>
-            <Text style={styles.secondaryText}>Gå til 1. etappe-plakaten</Text>
-          </TouchableOpacity>
-        </View>
+        <StagePoster
+          visible={true}
+          fromName={fromName}
+          toName={toName}
+          meters={legMeters}
+          etappeNo={etappeNo}
+          onStart={startEtappe}
+        />
       </View>
     </SafeAreaView>
   );
@@ -40,40 +47,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#0B0B0E" },
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24, // liten “offset” ned
-    alignItems: "center",
+    padding: 20,
+    justifyContent: "center",
   },
-  title: {
-    fontSize: 24,
-    color: "#FFFFFF",
-    fontWeight: "700",
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#CCCCCC",
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  buttons: {
-    width: "100%",
-    gap: 12,
-    marginTop: 8,
-  },
-  primaryBtn: {
-    backgroundColor: "#0B66D4",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  primaryText: { color: "#FFFFFF", fontSize: 16, fontWeight: "600" },
-  secondaryBtn: {
-    backgroundColor: "#1F2937",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  secondaryText: { color: "#FFFFFF", fontSize: 16, fontWeight: "600" },
 });

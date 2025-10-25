@@ -217,7 +217,6 @@ export default function PlayScreen() {
           fromName={stagePayload.fromName}
           toName={stagePayload.toName}
           meters={stagePayload.meters}
-          etappeNo={getRouteState().nextIndex}
           onStart={startNextStageNow}
         />
       </View>

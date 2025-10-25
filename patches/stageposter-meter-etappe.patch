@@ -1,0 +1,62 @@
+diff --git a/components/posters/StagePoster.tsx b/components/posters/StagePoster.tsx
+index 0000000..1111111 100644
+--- a/components/posters/StagePoster.tsx
++++ b/components/posters/StagePoster.tsx
+@@ -1,30 +1,36 @@
+ import React from "react";
+ import { View, Text, Pressable, StyleSheet } from "react-native";
+ 
+-type Props = {
+-  visible: boolean;
+-  fromName: string;
+-  toName: string;
+-  meters: number;
+-  onStart: () => void;
+-  onClose?: () => void;
+-};
++type Props = {
++  visible: boolean;
++  fromName: string;
++  toName: string;
++  meters: number;        // etappelengde i meter (heltall)
++  etappeNo?: number;     // 1-basert etappenummer (valgfri)
++  onStart: () => void;
++  onClose?: () => void;
++};
+ 
+-export default function StagePoster({ visible, fromName, toName, meters, onStart, onClose }: Props) {
++export default function StagePoster({
++  visible,
++  fromName,
++  toName,
++  meters,
++  etappeNo,
++  onStart,
++  onClose,
++}: Props) {
+   if (!visible) return null;
+ 
+   return (
+     <View style={styles.wrap}>
+-      <Text style={styles.route}>{fromName} → {toName}</Text>
+-      <Text style={styles.distance}>{(meters/1000).toFixed(1)} km</Text>
++      <Text style={styles.route}>
++        {etappeNo ? `Etappe ${etappeNo} • ` : ""}{fromName} → {toName}
++      </Text>
++      <Text style={styles.distance}>{meters.toLocaleString('no-NO')} m</Text>
+       <Pressable style={styles.cta} onPress={onStart}>
+-        <Text style={styles.ctaText}>Sett i gang</Text>
++        <Text style={styles.ctaText}>Sett i gang</Text>
+       </Pressable>
+     </View>
+   );
+ }
+ 
+ const styles = StyleSheet.create({
+   wrap: { padding: 16 },
+   route: { fontSize: 20, fontWeight: "700", textAlign: "center", color: "#fff", marginBottom: 6 },
+-  distance: { fontSize: 16, textAlign: "center", color: "#ddd", marginBottom: 16 }
++  distance: { fontSize: 16, textAlign: "center", color: "#ddd", marginBottom: 16 },
+   cta: { backgroundColor: "#fff", borderRadius: 10, paddingVertical: 12, paddingHorizontal: 16, alignSelf: "center" },
+   ctaText: { fontWeight: "700" }
+ });
