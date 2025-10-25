@@ -193,7 +193,6 @@ export default function PlayScreen() {
     return (
         <View style={styles.posterOverlay}>
             <IntroPoster 
-                // logoSource={require("@/assets/images/norquiz-logo.png")} // Antatt asset
                 from={fromNameDev}
                 to={toNameDev}
                 meters={metersDev}
