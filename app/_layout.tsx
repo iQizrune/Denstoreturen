@@ -4,10 +4,13 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAppLifecycleBridge } from "@/src/lib/appLifecycle";
+
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  useAppLifecycleBridge();
   useEffect(() => {
     let mounted = true;
     const init = async () => {
@@ -32,8 +35,16 @@ export default function RootLayout() {
         start={{ x: 0.3, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      <StatusBar style="light" />
-      <Stack screenOptions={{ contentStyle: styles.screen }} />
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+      <Stack
+   screenOptions={{
+     contentStyle: styles.screen,
+     statusBarStyle: "light",
+     statusBarTranslucent: true,
+     statusBarBackgroundColor: "#0b132b",
+     headerShown: false, // valgfritt: fjerner evt. header-linje
+   }}
+ />
     </View>
   );
 }
