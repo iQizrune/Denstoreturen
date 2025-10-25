@@ -17,7 +17,8 @@ import getStopQuiz from "@/src/banks/getStopQuizByer";
 import { takePendingStageStart, StageStartPayload } from "../src/lib/stageQueue";
 
 // Placeholder for nødvendig UI-komponent
-const PlayingPanels = require("@/src/partials/PlayingPanels").default;
+const PlayingPanels = require("@/src/partials/PlayingPanels_pauseable").default;
+
 
 // Global sperre: Hindrer at useArrivedStop trigger to ganger
 let suppressAutoStop = false;
