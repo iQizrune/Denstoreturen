@@ -497,7 +497,6 @@ function proceedNextEtappe() {
   </Pressable>
 )}
 
-
             <Pressable
               onPress={proceedNextEtappe}
               android_ripple={{ color: "#334155" }}
