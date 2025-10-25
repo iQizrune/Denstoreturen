@@ -1,25 +1,31 @@
-// app/_layout.tsx
-import * as React from "react";
-import { Slot, useRouter } from "expo-router";
-import { onArrival } from "@/src/lib/arrivalBus";
+import React, { useEffect } from "react";
+import { View } from "react-native";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 
-/**
- * RootLayout:
- *  - Lytter globalt på arrivals (fra useArrivedStop -> arrivalBus)
- *  - Ved arrival navigerer vi til /stop (StopModule-skjermen)
- */
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
-  const router = useRouter();
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      try {
+        await new Promise((r) => setTimeout(r, 50));
+      } finally {
+        if (mounted) SplashScreen.hideAsync();
+      }
+    };
+    init();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  React.useEffect(() => {
-    const off = onArrival(({ id }) => {
-      // Naviger til stoppskjerm. Vi sender med "name" (stopp-id)
-      // Stop-skjermen kan hente den via useLocalSearchParams() om ønskelig.
-      router.push({ pathname: "/stop", params: { name: id } });
-    });
-    return off;
-  }, [router]);
-
-  // Slot = plassholder for de nested rutene (app/**)
-  return <Slot />;
+  return (
+    <View style={{ flex: 1, backgroundColor: "#0b132b" }}>
+      <StatusBar style="light" />
+      <Stack screenOptions={{ contentStyle: { backgroundColor: "#0b132b" } }} />
+    </View>
+  );
 }

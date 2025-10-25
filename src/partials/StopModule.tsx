@@ -16,8 +16,19 @@ import { getStops } from "@/src/state/route";
 import { STOP_CUM_METERS } from "@/src/data/stops";
 
 
+
+
 // Tillat også StopQ fra adapteret (har isCorrect på option, ikke correctId på q)
 import type { StopQ as AdapterStopQ } from "@/src/banks/stopQuizAdapter";
+
+const toSlug = (s: string) =>
+  String(s || '')
+    .normalize('NFKD')
+    .toLowerCase()
+    .replace(/[\u0300-\u036f]/g, '')   // fjern diakritika
+    .replace(/[^a-z0-9]+/g, '-')       // alt som ikke er [a-z0-9] -> bindestrek
+    .replace(/^-+|-+$/g, '');          // trim bindestreker
+
 
 // ===== Typer =====
 export type Difficulty = "enkel" | "medium" | "vanskelig" | "umulig";
@@ -75,6 +86,7 @@ export default function StopModule(props: StopModuleProps) {
     onExit,
   } = props;
 
+  const stopSlug = toSlug(stopName);
   const [phase, setPhase] = useState<Phase>("idle");
   const [qIndex, setQIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -230,10 +242,10 @@ export default function StopModule(props: StopModuleProps) {
     // Ved ≥5 riktige – del ut byvåpen én gang
     if (correct >= AWARD_MIN_CORRECT && !awardedLocal) {
       try {
-        addCoat(stopName);
+        addCoat(stopSlug);
       } catch {}
       try {
-        publishAwardCoat({ type: "award-coat", stopId: stopName, perfect: correct === 6 });
+        publishAwardCoat({ type: "award-coat", stopId: stopSlug, perfect: correct === 6 });
       } catch {}
       try {
         onAwardByvapen?.(stopName);
@@ -434,7 +446,7 @@ function proceedNextEtappe() {
           {earned ? (
             <>
               <View style={{ marginVertical: 10 }}>
-                <BagIcon city={stopName} size={64} />
+                <BagIcon slug={stopSlug} size={64} />
               </View>
               <View
                 style={{
@@ -468,6 +480,24 @@ function proceedNextEtappe() {
               </Text>
             </Pressable>
 
+  {onOpenMap && (
+  <Pressable
+    accessibilityRole="button"
+    accessibilityLabel="Åpne kart"
+    onPress={onOpenMap}
+    style={{
+      backgroundColor: "#334155",
+      paddingVertical: 12,
+      borderRadius: 12,
+      alignItems: "center",
+      marginTop: 8,
+    }}
+  >
+    <Text style={{ color: "#fff", fontWeight: "800" }}>Åpne kart</Text>
+  </Pressable>
+)}
+
+
             <Pressable
               onPress={proceedNextEtappe}
               android_ripple={{ color: "#334155" }}
@@ -481,15 +511,17 @@ function proceedNextEtappe() {
           </View>
         </View>
 
-        <BagPanel
-          visible={bagOpen}
-          onClose={() => setBagOpen(false)}
-          onOpenMap={() => {
-            setBagOpen(false);
-            onOpenMap?.();
-          }}
-          title={username ? toPossessive(username) : undefined}
-        />
+        {bagOpen && (
+  <BagPanel
+    onClose={() => setBagOpen(false)}
+    onOpenMap={() => {
+      setBagOpen(false);
+      onOpenMap?.();
+    }}
+    title={username ? toPossessive(username) : undefined}
+  />
+)}
+
       </View>
     );
   }
