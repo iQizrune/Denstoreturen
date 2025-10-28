@@ -1,17 +1,17 @@
+// src/features/mine-ting/itemIcons.ts
 import { ImageSourcePropType } from "react-native";
 
-// Prøver å require et ikon. Hvis mangler: returner undefined (RN-bundler feiler ellers).
-const tryRequire = (path: string): ImageSourcePropType | undefined => {
-  try {
-    // @ts-ignore – RN bundler håndterer statiske require-paths
-    return require(path);
-  } catch {
-    return undefined;
-  }
+/**
+ * Statisk mapping: RN krever literal i require(...).
+ * Sørg for at disse filene finnes i prosjektet.
+ *  - assets/images/hjelpemidler/harpun.png
+ *  - assets/images/hjelpemidler/laks.png
+ */
+export const itemIconMap: Record<string, ImageSourcePropType | undefined> = {
+  harpun: require("../../../assets/images/hjelpemidler/harpun.png"),
+  laks: require("../../../assets/images/hjelpemidler/laks.png"),
 };
 
-// KEY → ikon. Husk å ha filen på disken:
-// assets/images/hjelpemidler/harpun.png
-export const itemIconMap: Record<string, ImageSourcePropType | undefined> = {
-  harpun: tryRequire("../../../assets/images/hjelpemidler/harpun.png"),
-};
+export function getItemIcon(key: string): ImageSourcePropType | undefined {
+  return itemIconMap[key];
+}

@@ -14,12 +14,18 @@ import { publishStageStart } from "@/src/lib/stageBus";
 import { queueStageStart } from "@/src/lib/stageQueue";
 import { getStops } from "@/src/state/route";
 import { STOP_CUM_METERS } from "@/src/data/stops";
-
-
-
-
+import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 // Tillat også StopQ fra adapteret (har isCorrect på option, ikke correctId på q)
 import type { StopQ as AdapterStopQ } from "@/src/banks/stopQuizAdapter";
+import { InteractionManager } from "react-native";
+import { router } from "expo-router";
+import { getItems as getBagItems } from "@/components/bag/bagStore";
+import RewardToast from "@/components/posters/RewardToast";
+
+
+
+
+
 
 const toSlug = (s: string) =>
   String(s || '')
@@ -28,6 +34,27 @@ const toSlug = (s: string) =>
     .replace(/[\u0300-\u036f]/g, '')   // fjern diakritika
     .replace(/[^a-z0-9]+/g, '-')       // alt som ikke er [a-z0-9] -> bindestrek
     .replace(/^-+|-+$/g, '');          // trim bindestreker
+
+
+
+function openPostStagePanel(next: () => void) {
+  mineTingStore.openPanelWithFooterButtons(
+    [
+      { label: "Åpne kart", onPress: () => router.push("/kart"), variant: "ghost" },
+      { label: "Neste etappe", onPress: next, variant: "primary" },
+    ],
+    true
+  );
+}
+
+// Hvilket hjelpemiddel er riktig per by/stopp
+const CORRECT_HELPER_FOR_STOP_SLUG: Record<string, string> = {
+  mandal: "laks",
+  // legg til flere: "kristiansand": "kompass", ...
+};
+
+
+
 
 
 // ===== Typer =====
@@ -93,6 +120,8 @@ export default function StopModule(props: StopModuleProps) {
   const [remainingMs, setRemainingMs] = useState(QUESTION_MS);
   const [bagOpen, setBagOpen] = useState(false);
   const [awardedLocal, setAwardedLocal] = useState(false);
+  const [showAwardToast, setShowAwardToast] = React.useState(false);
+
 
   // 4/6 hjelpemiddel-plakat (intern enkel modal)
   const [helpOpen, setHelpOpen] = useState(false);
@@ -100,36 +129,53 @@ export default function StopModule(props: StopModuleProps) {
 
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Feedback-tilstand for hjelpemiddel (mini-plakat) + timer-opprydding
+const [helperFeedback, setHelperFeedback] = React.useState<"success" | "fail" | null>(null);
+const helperTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+React.useEffect(() => {
+  return () => {
+    if (helperTimerRef.current) {
+      clearTimeout(helperTimerRef.current);
+      helperTimerRef.current = null;
+    }
+  };
+}, []);
+
+
   // ===== Normalisering: (Q | StopQ)[] -> Q[] (med correctId) =====
-  function normalizeToQ(items: ReadonlyArray<Q | AdapterStopQ>): Q[] {
-    return (items ?? []).map((it: any) => {
-      // Allerede “Q” (har correctId)
-      if (typeof it?.correctId === "string") {
-        const options = Array.isArray(it?.options)
-          ? it.options.map((o: any) => ({ id: String(o?.id ?? ""), label: String(o?.label ?? "") }))
-          : [];
-        return {
-          id: String(it?.id ?? ""),
-          text: String(it?.text ?? ""),
-          kind: it?.kind,
-          options,
-          correctId: String(it?.correctId ?? ""),
-          meta: it?.meta,
-        } as Q;
-      }
-      // AdapterStopQ → finn første option med isCorrect === true, fallback: første option
-      const opts = Array.isArray(it?.options) ? it.options : [];
-      const hit = opts.find((o: any) => o?.isCorrect) ?? opts[0] ?? { id: "" };
+  // ===== Normalisering: (Q | StopQ)[] -> Q[] (med correctId) =====
+function normalizeToQ(items: ReadonlyArray<Q | AdapterStopQ>): Q[] {
+  return (items ?? []).map((it: any) => {
+    // Allerede “Q” (har correctId)
+    if (typeof it?.correctId === "string") {
+      const options = Array.isArray(it?.options)
+        ? it.options.map((o: any) => ({ id: String(o?.id ?? ""), label: String(o?.label ?? "") }))
+        : [];
       return {
         id: String(it?.id ?? ""),
         text: String(it?.text ?? ""),
         kind: it?.kind,
-        options: opts.map((o: any) => ({ id: String(o?.id ?? ""), label: String(o?.label ?? "") })),
-        correctId: String(hit?.id ?? ""),
+        options,
+        correctId: String(it?.correctId ?? ""),
         meta: it?.meta,
       } as Q;
-    });
-  }
+    }
+
+    // AdapterStopQ → finn første option med isCorrect === true, fallback: første option
+    const opts = Array.isArray(it?.options) ? it.options : [];
+    const hit = opts.find((o: any) => o?.isCorrect) ?? opts[0] ?? { id: "" };
+    return {
+      id: String(it?.id ?? ""),
+      text: String(it?.text ?? ""),
+      kind: it?.kind,
+      options: opts.map((o: any) => ({ id: String(o?.id ?? ""), label: String(o?.label ?? "") })),
+      correctId: String(hit?.id ?? ""),
+      meta: it?.meta,
+    } as Q;
+  });
+}
+
 
   // Les + normaliser spørsmål når overlay skal brukes
   const quiz: Q[] = useMemo(() => {
@@ -240,18 +286,32 @@ export default function StopModule(props: StopModuleProps) {
     }
 
     // Ved ≥5 riktige – del ut byvåpen én gang
-    if (correct >= AWARD_MIN_CORRECT && !awardedLocal) {
-      try {
-        addCoat(stopSlug);
-      } catch {}
-      try {
-        publishAwardCoat({ type: "award-coat", stopId: stopSlug, perfect: correct === 6 });
-      } catch {}
-      try {
-        onAwardByvapen?.(stopName);
-      } catch {}
-      setAwardedLocal(true);
-    }
+if (correct >= AWARD_MIN_CORRECT && !awardedLocal) {
+  try {
+    addCoat(stopSlug);
+  } catch {}
+
+  try {
+    publishAwardCoat({ type: "award-coat", stopId: stopSlug, perfect: correct === 6 });
+  } catch {}
+
+  try {
+    onAwardByvapen?.(stopName);
+  } catch {}
+
+  setAwardedLocal(true);
+
+// Vis samme toast som i hjelpemiddel-grenen og gi den ~1.6s skjermtid
+setShowAwardToast(true);
+InteractionManager.runAfterInteractions(() => {
+  if (helperTimerRef.current) { clearTimeout(helperTimerRef.current); helperTimerRef.current = null; }
+  helperTimerRef.current = setTimeout(() => {
+    setShowAwardToast(false);
+    openPostStagePanel(() => proceedNextEtappe());
+  }, 1600);
+});
+}
+
 
     // Resultat-callback (uansett)
     try {
@@ -395,21 +455,78 @@ function proceedNextEtappe() {
 
               <View style={{ flexDirection: "row", gap: 8 }}>
                 <Pressable
-                  onPress={() => {
-                    const hadCorrectTool = true; // TODO: sjekk bag
-                    setHelpOpen(false);
-                    setHelpStopId(null);
-                    if (hadCorrectTool) {
-                      try { addCoat(stopName); } catch {}
-                      try { publishAwardCoat({ type: "award-coat", stopId: stopName, perfect: false }); } catch {}
-                    }
-                    proceedNextEtappe();
-                  }}
-                  android_ripple={{ color: "#334155" }}
-                  style={{ paddingVertical: 12, paddingHorizontal: 16, backgroundColor: "#2563eb", borderRadius: 10 }}
-                >
-                  <Text style={{ color: "white", fontWeight: "700" }}>Bruk hjelpemiddel</Text>
-                </Pressable>
+  onPress={() => {
+  // Lukk 4/6-dialogen, men IKKE gå videre enda
+  setHelpOpen(false);
+  setHelpStopId(null);
+
+  // Åpne Mine ting i valgmodus
+  const stopKey = typeof stopSlug === "string" ? stopSlug : toSlug(stopName);
+const correctKey = CORRECT_HELPER_FOR_STOP_SLUG[stopKey];
+
+
+  mineTingStore.openSelectHelper({
+    title: "Velg hjelpemiddel",
+    // allowKeys: correctKey ? [correctKey, "harpun", "laks"] : undefined, // valgfritt filter
+   onPick: (item) => {
+  const stopKey = typeof stopSlug === "string" ? stopSlug : toSlug(stopName);
+  const correctKey = CORRECT_HELPER_FOR_STOP_SLUG[stopKey];
+  const isCorrect = !!correctKey && item.key === correctKey;
+
+  // rydde ev. forrige timer
+  if (helperTimerRef.current) {
+    clearTimeout(helperTimerRef.current);
+    helperTimerRef.current = null;
+  }
+
+  if (isCorrect) {
+    // marker brukt riktig + award (slug!)
+    const awardSlug = stopKey;
+    try { mineTingStore.setItemStatusByKey(item.key, "used-correct"); } catch {}
+    try { addCoat(awardSlug); } catch {}
+    try { publishAwardCoat({ type: "award-coat", stopId: awardSlug, perfect: false }); } catch {}
+    setAwardedLocal(true);
+
+
+    // vis "Gratulerer!" kort, så åpne Mine ting
+    setHelperFeedback("success");
+    try { console.log("[helperFeedback] success"); } catch {}
+    helperTimerRef.current = setTimeout(() => {
+      setHelperFeedback(null);
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          openPostStagePanel(() => proceedNextEtappe());
+        }, 100); // liten ekstra puster
+      });
+    }, 1600); // 1.6s
+  } else {
+    // feil/vet-ikke → gråmarker kun hvis feil (ikke hvis "vet ikke" har tom key)
+    if (item.key) {
+      try { mineTingStore.setItemStatusByKey(item.key, "used-wrong"); } catch {}
+    }
+
+    // vis "Beklager!" kort, så åpne Mine ting
+    setHelperFeedback("fail");
+    try { console.log("[helperFeedback] success"); } catch {}
+    helperTimerRef.current = setTimeout(() => {
+      setHelperFeedback(null);
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          openPostStagePanel(() => proceedNextEtappe());
+        }, 100);
+      });
+    }, 1500); // 1.5s
+  }
+} 
+  });
+}}
+
+  android_ripple={{ color: "#334155" }}
+  style={{ paddingVertical: 12, paddingHorizontal: 16, backgroundColor: "#2563eb", borderRadius: 10 }}
+>
+  <Text style={{ color: "white", fontWeight: "700" }}>Bruk hjelpemiddel</Text>
+</Pressable>
+
 
                 <Pressable
                   onPress={() => {
@@ -520,6 +637,18 @@ function proceedNextEtappe() {
     title={username ? toPossessive(username) : undefined}
   />
 )}
+<RewardToast
+  visible={!!helperFeedback}
+  variant={helperFeedback === "success" ? "success" : "fail"}
+  title={helperFeedback === "success" ? "Gratulerer!" : "Beklager!"}
+  subtitle={helperFeedback === "success" ? "Du klarte byvåpenet!" : "Ingen byvåpen denne gangen."}
+/>
+<RewardToast
+  visible={showAwardToast}
+  variant="success"
+  title="Byquiz ferdig"
+  subtitle="Du vant byvåpenet!"
+/>
 
       </View>
     );
