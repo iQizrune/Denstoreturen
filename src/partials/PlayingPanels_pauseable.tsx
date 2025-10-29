@@ -27,6 +27,11 @@ import { addMeters, getTotalMeters } from "@/src/state/run";
 import TimeBar from "@/src/partials/TimeBar";
 import { publishMeters, subscribeMeters } from "@/src/lib/progressBus";
 import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
+import { recordAnswer } from "@/components/bag/statsStore";
+import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
+
+
+
 
 
 const DEBUG = false;
@@ -51,6 +56,8 @@ type QA = {
 };
 
 export default function PlayingPanelsPauseable({ roundSeed = 0 }: { roundSeed?: number }) {
+  console.log("[playingPanels] uses stats module =", __STATS_MODULE_ID);
+
   useEffect(() => {
     mineTingStore.setDisabled(true);
     return () => { mineTingStore.setDisabled(false); };
@@ -200,6 +207,8 @@ export default function PlayingPanelsPauseable({ roundSeed = 0 }: { roundSeed?: 
 
     const kind = (q?.meta?.kind as string) || "core";
     const isCorrect = !!(q?.correctId && opt.id === q.correctId);
+    recordAnswer(isCorrect);
+
     let delta = 0;
 
     if (kind === "core" || kind === "flags") {

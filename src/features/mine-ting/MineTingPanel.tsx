@@ -1,18 +1,37 @@
 // src/features/mine-ting/MineTingPanel.tsx
 // Auto-generated update (2025-10-27): Byvåpen koblet til bagStore, select-modus, flere footer-knapper, lockClose.
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Modal, View, Text, Pressable, ScrollView, Image, StyleSheet } from "react-native";
 import { mineTingStore, HelpItem } from "./mineTingStore";
 import { itemIconMap } from "./itemIcons";
 
 // Les samme kilde som 5/6-flyten bruker
-import { getItems as getBagItems, subscribe as subscribeBag } from "@/components/bag/bagStore";
 import { COAT_IMAGES as coatImages } from "@/src/data/coat_images";
+import type { StatsSnapshotV1 } from "@/components/bag/statsTypes";
+import { getItems as getBagItems, subscribe as subscribeBag } from "@/components/bag/bagStore";
+import * as stats from "@/components/bag/statsStore";
+import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
+
+
+
 
 type Coat = { city: string };
 
+// NY: enkel formattering for effektiv spilletid
+function formatHMS(totalSeconds: number): string {
+  const s = Math.max(0, Math.floor(totalSeconds || 0));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+
 export default function MineTingPanel() {
+    console.log("[mine] uses stats module =", __STATS_MODULE_ID);
   const [open, setOpen] = useState(mineTingStore.open);
   const [mode, setMode] = useState(mineTingStore.mode);
   const [items, setItems] = useState<HelpItem[]>(mineTingStore.items);
@@ -76,6 +95,25 @@ export default function MineTingPanel() {
 
   // Normaliser “Mandal” -> “mandal”, “Lindesnes fyr” -> “lindesnes-fyr” osv.
   const toSlug = (city: string) => city.toLowerCase().replace(/\s+/g, "-");
+const stat = useSyncExternalStore(
+  stats.subscribe,
+  stats.getSnapshot,
+  stats.getSnapshot
+) as StatsSnapshotV1;
+
+  // NY: koble på stats (snapshot via subscribe)
+  const [playSec, setPlaySec] = useState<number>(() => stats.getLivePlaySeconds());
+useEffect(() => {
+  const t = setInterval(() => {
+    const v = stats.getLivePlaySeconds();
+    console.log("[panel] tick →", v);
+    setPlaySec(v);
+  }, 1000);
+  return () => clearInterval(t);
+}, []);
+
+
+  const playHms = useMemo(() => formatHMS(playSec), [playSec]);
 
   return (
     <Modal
@@ -213,7 +251,28 @@ export default function MineTingPanel() {
             {mode === "view" && (
               <>
                 <Text style={styles.sectionTitle}>Statistikk</Text>
-                <Text style={styles.empty}>Kommer snart: total effektiv tid, per-kategori m.m.</Text>
+                <View style={styles.statsCard}>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statsKey}>Effektiv spilletid</Text>
+                    <Text style={styles.statsVal}>{playHms}</Text>
+                  </View>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statsKey}>Soft restarter</Text>
+                    <Text style={styles.statsVal}>{stat.softRestarts}</Text>
+                  </View>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statsKey}>Besvarte (totalt)</Text>
+                    <Text style={styles.statsVal}>{stat.totalAnswered}</Text>
+                  </View>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statsKey}>Riktig</Text>
+                    <Text style={styles.statsVal}>{stat.totalCorrect}</Text>
+                  </View>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statsKey}>Feil</Text>
+                    <Text style={styles.statsVal}>{stat.totalWrong}</Text>
+                  </View>
+                </View>
               </>
             )}
           </ScrollView>
@@ -308,4 +367,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   itemLabel: { fontSize: 12, textAlign: "center" },
+
+  // NY: små stiler for statistikk-kort
+  statsCard: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.04)",
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 4,
+  },
+  statsKey: {
+    fontSize: 14,
+    color: "#444",
+  },
+  statsVal: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#111",
+  },
 });

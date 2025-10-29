@@ -19,6 +19,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRef } from "react";
 import * as StageQueueModule from "@/src/lib/stageQueue";
 import { installBagPersistence } from "../components/bag/bagPersist"; // tilpass sti ved behov
+import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
+import { installStatsPersistence } from "@/components/bag/statsPersist";
+import { startSession, stopSession } from "@/components/bag/statsStore";
+import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
 
 // Lokal alias så guarden ser "stageQueue" uten at lib må eksportere den navngitt
 const stageQueue: any =
@@ -52,6 +56,8 @@ function useHUDStatus() {
       setNextMeters(getNextStopAtMeters());
     });
     setNextMeters(getNextStopAtMeters());
+    console.log("[play] uses stats module =", __STATS_MODULE_ID);
+
     return off;
   }, []);
 
@@ -161,6 +167,26 @@ useEffect(__guard_noop, []); // takePendingStageStart
     installBagPersistence().catch(() => {});
   }, []);
 
+
+useEffect(() => {
+  let unsub: undefined | (() => void);
+  (async () => {
+    unsub = await installStatsPersistence();
+  })();
+  return () => {
+    if (typeof unsub === "function") unsub();
+  };
+}, []);
+
+const [mineOpen, setMineOpen] = useState<boolean>(mineTingStore.open === true);
+
+useEffect(() => {
+  setMineOpen(!!mineTingStore.open);
+  const off = mineTingStore.subscribe(() => setMineOpen(!!mineTingStore.open));
+  return () => { off?.(); };
+}, []);
+
+
   const router = useRouter();
   const { meters, remaining, goalName } = useHUDStatus();
   const [stopVisible, setStopVisible] = useState(false);
@@ -170,6 +196,76 @@ useEffect(__guard_noop_stop, [stopVisible]); // takePendingStageStart
   const [stagePayload, setStagePayload] = useState<StageState | null>(null);
   const [devPoster, setDevPoster] = useState<DevPosterId>("none");
   const [roundSeed, setRoundSeed] = useState(0);
+const stopGraceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const playingRef = useRef(false);
+
+// Debounce STOP slik at forbigående panel/plakat ikke nuller tid umiddelbart
+const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+useEffect(() => {
+  const rawPlayingNow = !stagePayload && devPoster === "none" && !mineOpen;
+
+  // Avbryt evt. pågående stopp-timer ved enhver endring
+  if (pauseTimerRef.current) {
+    clearTimeout(pauseTimerRef.current);
+    pauseTimerRef.current = null;
+  }
+
+  if (rawPlayingNow) {
+  // Avbryt eventuell forsinket STOP hvis vi blir "playing" igjen
+  if (stopGraceRef.current) {
+    clearTimeout(stopGraceRef.current);
+    stopGraceRef.current = null;
+  }
+  // Vi er i faktisk spørsmålsmodus: start straks hvis ikke allerede startet
+  if (!playingRef.current) {
+    console.log("[play/session] → START");
+    startSession();
+    playingRef.current = true;
+  }
+} else {
+  // Ikke spørsmålsmodus: vent litt før vi stopper (debounce)
+  if (playingRef.current) {
+    pauseTimerRef.current = setTimeout(() => {
+      if (!playingRef.current) return; // allerede stoppet i mellomtiden
+      // Sjekk tilstand på nytt etter debounce
+      const stillNotPlaying = !!stagePayload || devPoster !== "none" || !!mineOpen;
+      if (stillNotPlaying) {
+        console.log("[play/session] → STOP (debounced)");
+        stopSession();
+        playingRef.current = false;
+      }
+    }, 800); // 0.8s debounce på STOP
+  }
+}
+
+}, [stagePayload, devPoster, mineOpen]);
+
+// Sikkerhetsnett ved unmount
+useEffect(() => {
+  return () => {
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+    if (playingRef.current) {
+      stopSession();
+      playingRef.current = false;
+    }
+  };
+}, []);
+
+
+useEffect(() => {
+  // Sikkerhetsnett ved unmount
+  return () => {
+    if (playingRef.current) {
+      stopSession();
+      playingRef.current = false;
+    }
+  };
+}, []);
 
   // 1) Ankomst: Lytter på meter og åpner StopModule
   useArrivedStop(({ id }) => {
