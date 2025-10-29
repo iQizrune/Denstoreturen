@@ -56,7 +56,6 @@ function useHUDStatus() {
       setNextMeters(getNextStopAtMeters());
     });
     setNextMeters(getNextStopAtMeters());
-    console.log("[play] uses stats module =", __STATS_MODULE_ID);
 
     return off;
   }, []);
@@ -220,7 +219,6 @@ useEffect(() => {
   }
   // Vi er i faktisk spørsmålsmodus: start straks hvis ikke allerede startet
   if (!playingRef.current) {
-    console.log("[play/session] → START");
     startSession();
     playingRef.current = true;
   }
@@ -232,7 +230,6 @@ useEffect(() => {
       // Sjekk tilstand på nytt etter debounce
       const stillNotPlaying = !!stagePayload || devPoster !== "none" || !!mineOpen;
       if (stillNotPlaying) {
-        console.log("[play/session] → STOP (debounced)");
         stopSession();
         playingRef.current = false;
       }

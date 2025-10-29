@@ -2,7 +2,6 @@
 import type { StatsSnapshotV1 } from "./statsTypes";
 
 export const __STATS_MODULE_ID = Math.random().toString(36).slice(2);
-console.log("[stats] module id =", __STATS_MODULE_ID);
 
 
 type Listener = () => void;
@@ -92,7 +91,6 @@ export function hydrateFromSnapshot(s: StatsSnapshotV1) {
   notify();
 
   // Debug (valgfritt, men nyttig kortsiktig)
-  console.log("[stats] hydrateFromSnapshot done; hadRunningSession =", hadRunningSession);
 }
 
 
@@ -107,7 +105,6 @@ export function startSession(nowMs: number = Date.now()) {
   if (state._sessionStartedAt == null) {
     state._sessionStartedAt = nowMs;
     // DEBUG
-    console.log("[stats] startSession", new Date(nowMs).toISOString());
     // (valgfritt) notify();  // la stå kommentert – vi trenger ikke re-render på start
   }
 }
@@ -118,7 +115,6 @@ export function stopSession(nowMs: number = Date.now()) {
     const delta = Math.max(0, Math.floor((nowMs - state._sessionStartedAt) / 1000));
     state.totalPlaySeconds += delta;
     // DEBUG
-    console.log("[stats] stopSession delta(s) =", delta, "total =", state.totalPlaySeconds + "s");
     state._sessionStartedAt = null;
     notify();
   }
@@ -149,7 +145,6 @@ export function getLivePlaySeconds(nowMs: number = Date.now()): number {
   const active = state._sessionStartedAt != null;
   const since = active ? Math.floor((nowMs - (state._sessionStartedAt as number)) / 1000) : 0;
   const total = active ? base + Math.max(0, since) : base;
-  console.log("[stats/live] active:", active, "base:", base, "since:", since, "→", total);
   return total;
 }
 

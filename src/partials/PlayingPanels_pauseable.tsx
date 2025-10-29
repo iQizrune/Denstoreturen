@@ -56,7 +56,6 @@ type QA = {
 };
 
 export default function PlayingPanelsPauseable({ roundSeed = 0 }: { roundSeed?: number }) {
-  console.log("[playingPanels] uses stats module =", __STATS_MODULE_ID);
 
   useEffect(() => {
     mineTingStore.setDisabled(true);

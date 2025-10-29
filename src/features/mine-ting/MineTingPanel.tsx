@@ -31,7 +31,6 @@ function formatHMS(totalSeconds: number): string {
 }
 
 export default function MineTingPanel() {
-    console.log("[mine] uses stats module =", __STATS_MODULE_ID);
   const [open, setOpen] = useState(mineTingStore.open);
   const [mode, setMode] = useState(mineTingStore.mode);
   const [items, setItems] = useState<HelpItem[]>(mineTingStore.items);
@@ -106,7 +105,6 @@ const stat = useSyncExternalStore(
 useEffect(() => {
   const t = setInterval(() => {
     const v = stats.getLivePlaySeconds();
-    console.log("[panel] tick →", v);
     setPlaySec(v);
   }, 1000);
   return () => clearInterval(t);
