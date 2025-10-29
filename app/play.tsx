@@ -18,6 +18,7 @@ import { takePendingStageStart } from "@/src/lib/stageQueue";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRef } from "react";
 import * as StageQueueModule from "@/src/lib/stageQueue";
+import { installBagPersistence } from "../components/bag/bagPersist"; // tilpass sti ved behov
 
 // Lokal alias så guarden ser "stageQueue" uten at lib må eksportere den navngitt
 const stageQueue: any =
@@ -154,6 +155,10 @@ useEffect(__guard_noop, []); // takePendingStageStart
       }
       console.log("[play] UNMOUNT v2");
     };
+  }, []);
+
+  useEffect(() => {
+    installBagPersistence().catch(() => {});
   }, []);
 
   const router = useRouter();
