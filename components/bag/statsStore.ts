@@ -1,9 +1,6 @@
 // components/bag/statsStore.ts
 import type { StatsSnapshotV1 } from "./statsTypes";
 
-export const __STATS_MODULE_ID = Math.random().toString(36).slice(2);
-
-
 type Listener = () => void;
 
 type StatsState = {

@@ -28,10 +28,6 @@ import TimeBar from "@/src/partials/TimeBar";
 import { publishMeters, subscribeMeters } from "@/src/lib/progressBus";
 import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 import { recordAnswer } from "@/components/bag/statsStore";
-import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
-
-
-
 
 
 const DEBUG = false;

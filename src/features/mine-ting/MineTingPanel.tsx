@@ -11,9 +11,6 @@ import { COAT_IMAGES as coatImages } from "@/src/data/coat_images";
 import type { StatsSnapshotV1 } from "@/components/bag/statsTypes";
 import { getItems as getBagItems, subscribe as subscribeBag } from "@/components/bag/bagStore";
 import * as stats from "@/components/bag/statsStore";
-import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
-
-
 
 
 type Coat = { city: string };

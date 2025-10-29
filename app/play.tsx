@@ -22,7 +22,6 @@ import { installBagPersistence } from "../components/bag/bagPersist"; // tilpass
 import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 import { installStatsPersistence } from "@/components/bag/statsPersist";
 import { startSession, stopSession } from "@/components/bag/statsStore";
-import { __STATS_MODULE_ID } from "@/components/bag/statsStore";
 
 // Lokal alias så guarden ser "stageQueue" uten at lib må eksportere den navngitt
 const stageQueue: any =
