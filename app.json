@@ -4,13 +4,15 @@
     "slug": "iqiz",
     "scheme": "iqiz",
     "icon": "./assets/images/krikerogkrokerlogo.png",
-
     "splash": {
       "image": "./assets/images/krikerogkrokerlogo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#cbe9f5"
+      "backgroundColor": "#0b132b",
+      "dark": {
+        "image": "./assets/images/krikerogkrokerlogo.png",
+        "backgroundColor": "#0b132b"
+      }
     },
-
     "assetBundlePatterns": [
       "**/*"
     ],

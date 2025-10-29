@@ -1,7 +1,16 @@
 // components/bag/BagIcon.tsx
 import React from "react";
 import { Image, View, Text } from "react-native";
-import { COAT_IMAGES } from "../../src/coat_images";
+import { COAT_IMAGES } from "@/src/data/coat_images";
+
+const toSlug = (s?: string) =>
+  String(s || '')
+    .normalize('NFKD')
+    .toLowerCase()
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 
 function slugify(s?: string) {
   const raw = String(s ?? "")
@@ -20,7 +29,8 @@ export function BagIcon({
   city?: string;
   size?: number;
 }) {
-  const key = (slug ? String(slug) : slugify(city)).toLowerCase();
+  const key = (slug ?? toSlug(city)).toLowerCase();
+
   if (!key) {
     return (
       <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>

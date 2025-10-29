@@ -1,3 +1,4 @@
+
 export type AgeGroup = 'barn' | 'ung' | 'voksen';
 export type Profile = { name: string; ageGroup: AgeGroup; avatar: string };
 

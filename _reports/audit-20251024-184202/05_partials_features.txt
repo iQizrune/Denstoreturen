@@ -1,0 +1,7 @@
+=== PARTIALS / FEATURES
+src/features
+src/partials
+src/partials/StopModule.tsx:65:export default function StopModule(props: StopModuleProps) {
+src/features/stop/StopPanel.tsx:9:export default function StopPanel({ onComplete }: { onComplete: () => void }) {
+src/partials/TimeBar.tsx:15:export default function TimeBar({
+src/partials/PlayingPanels.tsx:56:export default function PlayingPanels() {

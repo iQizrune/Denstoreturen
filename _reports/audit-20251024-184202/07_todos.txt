@@ -1,0 +1,4 @@
+=== SØK: TODO / FIXME / HACK
+src/partials/StopModule.tsx:387:                    const hadCorrectTool = true; // TODO: sjekk bag
+app/kart.tsx:90:        getStopQuiz={(name:string) => [] /* TODO: koble til ekte quizadapter senere */}
+src/banks/cityAdapter.ts:5:  // TODO: Bytt til ekte by-spørsmål senere

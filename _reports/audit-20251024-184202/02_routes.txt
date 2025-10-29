@@ -1,0 +1,13 @@
+=== APP ROUTES (expo-router)
+app/_layout.tsx
+app/(game)/pre-etappe.tsx
+app/(intro)/info/1.tsx
+app/(intro)/info/2.tsx
+app/+not-found.tsx
+app/index.tsx
+app/kart.tsx
+app/play.tsx
+app/profile.tsx
+app/results.tsx
+app/start.tsx
+app/stop.tsx

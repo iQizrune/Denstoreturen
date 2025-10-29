@@ -51,6 +51,12 @@ export function addHelp(helpId: string) {
   });
   emit();
 }
+// Tømmer sekken i minne og varsler abonnenter
+export function clearRuntime(): void {
+  items.length = 0;
+  emit();
+}
+
 
 export function consumeHelp(itemId: string): boolean {
   const idx = items.findIndex(it => it.id === itemId && it.kind === "help");

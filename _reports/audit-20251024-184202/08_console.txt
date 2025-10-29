@@ -1,0 +1,10 @@
+=== SØK: console.log
+src/partials/StopModule.tsx:272:      console.log(`[StopModule] Stage queued: ${currentStop.name} -> ${nextStop.name}.`);
+src/partials/StopModule.tsx:280:    console.log("[StopModule] onNextEtappe error", e);
+src/partials/PlayingPanels.tsx:86:    if (DEBUG) console.log("[PlayingPanels] ingen spørsmål tilgjengelig");
+src/partials/PlayingPanels.tsx:293:    console.log("[PlayingPanels] q", {
+src/banks/flagsAdapter.ts:88:  console.log("[flagsAdapter] items from module:", items.length);
+src/banks/flagsAdapter.ts:140:  console.log("[flagsAdapter] items from assets:", entries.length);
+src/lib/stageBus.ts:13:  console.log("[stageBus] publishStageStart", payload);
+src/lib/stageQueue.ts:14:    try { console.log("[stageQueue] queued", payload); } catch {}
+src/lib/stageQueue.ts:22:    try { console.log("[stageQueue] taken", p); } catch {}

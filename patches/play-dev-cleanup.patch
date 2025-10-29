@@ -1,0 +1,69 @@
+*** a/app/play.tsx
+--- b/app/play.tsx
+@@
+   // === RENDER DEV PLAKATVELGER (Hvor teksten ligger) ===
+   const renderDevPoster = () => {
+-    if (devPoster === 'none') return null;
++    if (devPoster === 'none') return null;
+ 
+     let title = "";
+     let content: React.ReactNode = null;
+ 
+-    // Hardkodet dummy data for plakatinnhold
+-    const dummyData: { from: string; to: string; meters: number } = {
+-        from: "Lindesnes Fyr", 
+-        to: "Mandal", 
+-        meters: 39467 
+-    };
++    // Ekte rutedata for plakat (ingen hardkode)
++    const rs = getRouteState();
++    const fromName = rs.stops[Math.max(0, (rs.nextIndex ?? 1) - 1)]?.name ?? "Start";
++    const toName   = rs.stops[rs.nextIndex ?? 1]?.name ?? "Mål";
++    const current  = getTotalMeters();
++    const goal     = getNextStopAtMeters();
++    const meters   = Math.max(0, goal - current);
+ 
+     // Logikk for innhold basert på valgt plakat
+     if (devPoster === 'trick') {
+         title = "TRIKS: 'Feil' er Riktig";
+         content = (
+@@
+     return (
+         <View style={styles.posterOverlay}>
+             <IntroPoster 
+                 // logoSource={require("@/assets/images/norquiz-logo.png")} // Antatt asset
+-                from={dummyData.from}
+-                to={dummyData.to}
+-                meters={dummyData.meters}
++                from={fromName}
++                to={toName}
++                meters={meters}
+                 onStart={() => setDevPoster('none')} // Simulerer start av quiz
+             >
+                 {content}
+                 {DevButtons}
+             </IntroPoster>
+@@
+       {/* Main Quiz Area */}
+       <View style={{ flex: 1 }}>
+         {PlayingPanels ? <PlayingPanels roundSeed={roundSeed} /> : <Text style={styles.loadingText}>Laster quiz...</Text>}
+       </View>
+ 
+-      {/* Dev-knapp: Hopp ELLER vis plakatvelgeren */}
+-      <Pressable onPress={devJump} style={styles.devBtn}>
+-        <Text style={styles.devBtnText}>Dev: Hopp til {goalName} (-100 m)</Text>
+-      </Pressable>
++      {/* Dev-knapp: kun i utviklingsmodus */}
++      {__DEV__ && (
++        <Pressable onPress={devJump} style={styles.devBtn}>
++          <Text style={styles.devBtnText}>Dev: Hopp til {goalName} (-100 m)</Text>
++        </Pressable>
++      )}
+@@
+-      {/* Render Dev Plakatvelger (vises over alt annet) */}
+-      {renderDevPoster()}
++      {/* Render Dev Plakatvelger (kun i utviklingsmodus, vises over alt annet) */}
++      {__DEV__ ? renderDevPoster() : null}
+     </View>
+   );
+ }

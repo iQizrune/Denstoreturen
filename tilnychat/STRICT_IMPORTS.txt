@@ -1,0 +1,145 @@
+components/bag/BagIcon.tsx:2:import React from "react";
+components/bag/BagIcon.tsx:3:import { Image, View, Text } from "react-native";
+components/bag/BagIcon.tsx:4:import { COAT_IMAGES } from "@/src/data/coat_images";
+src/partials/StopModule.tsx:4:import * as React from "react";
+src/partials/StopModule.tsx:5:import { useEffect, useMemo, useRef, useState } from "react";
+src/partials/StopModule.tsx:6:import { View, Text, Pressable, FlatList, Modal } from "react-native";
+src/partials/StopModule.tsx:8:import ArrivalPoster from "@/components/posters/ArrivalPoster";
+src/partials/StopModule.tsx:9:import BagPanel from "@/components/bag/BagPanel";
+src/partials/StopModule.tsx:10:import { BagIcon } from "@/components/bag/BagIcon";
+src/partials/StopModule.tsx:11:import { addCoat } from "@/components/bag/bagStore";
+src/partials/StopModule.tsx:12:import { publishAwardCoat } from "@/src/app-moved/kartBus";
+src/partials/StopModule.tsx:13:import { publishStageStart } from "@/src/lib/stageBus";
+src/partials/StopModule.tsx:14:import { queueStageStart } from "@/src/lib/stageQueue";
+src/partials/StopModule.tsx:15:import { getStops } from "@/src/state/route";
+src/partials/StopModule.tsx:16:import { STOP_CUM_METERS } from "@/src/data/stops";
+src/partials/StopModule.tsx:20:import type { StopQ as AdapterStopQ } from "@/src/banks/stopQuizAdapter";
+components/bag/BagPanel.tsx:2:import React, { useEffect, useState } from "react";
+components/bag/BagPanel.tsx:3:import { View, Text, Pressable, FlatList } from "react-native";
+components/bag/BagPanel.tsx:4:import { getItems, subscribe, type BagItem } from "./bagStore";
+src/partials/TimeBar.tsx:2:import * as React from "react";
+src/partials/TimeBar.tsx:3:import { useEffect, useRef } from "react";
+src/partials/TimeBar.tsx:4:import { View, StyleSheet, Animated } from "react-native";
+src/partials/PlayingPanels.tsx:2:import * as React from "react";
+src/partials/PlayingPanels.tsx:3:import { useMemo, useState, useEffect, useRef } from "react";
+src/partials/PlayingPanels.tsx:14:} from "react-native";
+src/partials/PlayingPanels.tsx:15:import { useSafeAreaInsets } from "react-native-safe-area-context";
+src/partials/PlayingPanels.tsx:17:import { categoryFor } from "@/src/lib/sequencePlan";
+src/partials/PlayingPanels.tsx:18:import { buildQuizPool } from "@/src/banks/buildQuizPool";
+src/partials/PlayingPanels.tsx:19:import { FLAGS_ASSETS } from "@/src/banks/flagsAssets";
+src/partials/PlayingPanels.tsx:20:import { REVEAL_ASSETS } from "@/src/banks/revealAssets";
+src/partials/PlayingPanels.tsx:21:import { addMeters, getTotalMeters } from "@/src/state/run";
+src/partials/PlayingPanels.tsx:22:import TimeBar from "@/src/partials/TimeBar";
+src/partials/PlayingPanels.tsx:23:import { publishMeters, subscribeMeters } from "@/src/lib/progressBus";
+src/map/mapUtils.ts:4:import type { RouteLeg } from "@/src/types/route";
+components/map/MapViewHybrid.tsx:5:import React, { useMemo, useState } from "react";
+components/map/MapViewHybrid.tsx:6:import { View, StyleSheet, Text } from "react-native";
+components/map/MapViewHybrid.tsx:7:import MapView, { Polyline, Marker } from "react-native-maps";
+components/map/MapViewHybrid.tsx:10:import { loadLegs } from "@/src/route/legsFromJson";
+components/map/MapViewHybrid.tsx:11:import { getRouteCenter, getLegsAsPolyline, getLegPathForIndex } from "@/src/map/mapUtils";
+components/map/MapViewHybrid.tsx:12:import { STOP_NAMES } from "@/src/data/stops"; 
+components/map/MapViewHybrid.tsx:13:import type { RouteLeg } from "@/src/types/route";
+components/ThemedView.tsx:1:import { View, type ViewProps } from "react-native";
+components/ThemedView.tsx:3:import { useThemeColor } from "@/hooks/useThemeColor";
+src/banks/revealAssets.ts:3:  "albert-einstein": require("@/assets/Avdekking/albert-einstein.jpg"),
+src/banks/revealAssets.ts:4:  "audrey-hepburn": require("@/assets/Avdekking/audrey-hepburn.jpg"),
+src/banks/revealAssets.ts:5:  "elizabeth-taylor": require("@/assets/Avdekking/elizabeth-taylor.jpg"),
+src/banks/revealAssets.ts:6:  "elvis": require("@/assets/Avdekking/elvis.png"),
+src/banks/revealAssets.ts:7:  "frihetsgudinnen": require("@/assets/Avdekking/frihetsgudinnen.jpg"),
+src/banks/revealAssets.ts:8:  "ghandi": require("@/assets/Avdekking/ghandi.png"),
+src/banks/revealAssets.ts:9:  "muhammed-ali": require("@/assets/Avdekking/muhammed-ali.png"),
+src/banks/revealAssets.ts:10:  "nelson-mandela": require("@/assets/Avdekking/nelson-mandela.png"),
+src/banks/revealAssets.ts:11:  "spiderman": require("@/assets/Avdekking/spiderman.jpg"),
+src/banks/revealAssets.ts:12:  "taj-mahal": require("@/assets/Avdekking/taj-mahal.jpg"),
+src/banks/revealAssets.ts:13:  "winston-churchhill": require("@/assets/Avdekking/winston-churchhill.png"),
+src/hooks/useArrivedStop.ts:6:import * as React from "react";
+src/hooks/useArrivedStop.ts:7:import { onMeters } from "@/src/lib/progressBus";
+src/hooks/useArrivedStop.ts:8:import { STOP_CUM_METERS, STOP_NAMES } from "@/src/data/stops";
+src/hooks/useArrivedStop.ts:9:import { indexFromMeters } from "@/src/route/stopsFromData";
+src/hooks/useArrivedStop.ts:10:import { publishArrival } from "@/src/lib/arrivalBus";
+components/ThemedText.tsx:1:import { StyleSheet, Text, type TextProps } from "react-native";
+components/ThemedText.tsx:3:import { useThemeColor } from "@/hooks/useThemeColor";
+components/posters/IntroPoster.tsx:1:import * as React from "react";
+components/posters/IntroPoster.tsx:2:import { View, Text, Image, Pressable } from "react-native";
+components/ui/IconSymbol.tsx:3:import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+components/ui/IconSymbol.tsx:4:import { SymbolWeight, SymbolViewProps } from "expo-symbols";
+components/ui/IconSymbol.tsx:5:import { ComponentProps } from "react";
+components/ui/IconSymbol.tsx:6:import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
+src/map/react-native-maps.web.ts:1:import React from 'react';
+src/hooks/useCurrentStopIndex.ts:1:import * as React from "react";
+src/hooks/useCurrentStopIndex.ts:2:import { onMeters } from "@/src/lib/progressBus";
+src/hooks/useCurrentStopIndex.ts:3:import { indexFromMeters } from "@/src/route/stopsFromData";
+components/posters/ArrivalPoster.tsx:1:import React from "react";
+components/posters/ArrivalPoster.tsx:2:import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+components/posters/ArrivalPoster.tsx:19:  /** Valgfri logo (f.eks. require("../assets/norquiz-logo.png")) */
+src/route/legsFromJson.ts:1:import type { RouteLeg } from "@/src/types/route";
+src/route/legsFromJson.ts:11:  try { raw = require("@/assets/route/route-legs.json"); } catch {}
+src/route/legsFromJson.ts:12:  if (!raw) { try { raw = require("../../assets/route/route-legs.json"); } catch {} }
+src/route/legsFromJson.ts:13:  if (!raw) { try { raw = require("../../../assets/route/route-legs.json"); } catch {} }
+src/route/legsFromJson.ts:14:  if (!raw) { try { raw = require("@/assets/route/route-legs"); } catch {} } // uten .json i tilfelle
+src/features/stop/StopPanel.tsx:1:import React, { useMemo, useState } from 'react';
+src/features/stop/StopPanel.tsx:2:import { View, Text, Pressable } from 'react-native';
+src/features/stop/StopPanel.tsx:3:import { loadCityBank } from '@/src/banks/cityAdapter';
+src/features/stop/StopPanel.tsx:4:import { getProfile } from '@/src/state/profile';
+src/features/stop/StopPanel.tsx:5:import { getCurrentStop } from '@/src/state/route';
+src/route/stopsFromData.ts:6:import type { RouteLeg, RoutePoint } from "@/src/types/route";
+src/route/stopsFromData.ts:7:import { STOP_NAMES, STOP_CUM_METERS } from "@/src/data/stops";
+components/posters/StagePoster.tsx:1:import React from "react";
+components/posters/StagePoster.tsx:2:import { View, Text, Pressable, StyleSheet } from "react-native";
+src/banks/flags.ts:1:import { Q } from "./types";
+src/banks/flags.ts:2:import { shuffle } from "./util";
+src/state/route.ts:2:import { STOP_NAMES, STOP_CUM_METERS } from "@/src/data/stops";
+src/banks/getStopQuizByer.ts:2:import { BYQUIZ_BANKS } from "./byer";
+src/banks/getStopQuizByer.ts:3:import type { StopQ } from "./stopQuizAdapter";
+src/banks/flagsAdapter.ts:6:import { FLAGS_ASSETS } from "@/src/banks/flagsAssets";
+src/banks/flagsAdapter.ts:7:import { ManagedQuestion, normalizeBank } from "@/src/banks/sequence";
+src/banks/flagsAdapter.ts:57:    mod = require("@/src/banks/flags");
+src/engine/index.ts:1:export * from './conductor';
+src/banks/flagsAssets.ts:4:  "algerie": require("@/assets/flags/algerie.png"),
+src/banks/flagsAssets.ts:5:  "andorra": require("@/assets/flags/andorra.png"),
+src/banks/flagsAssets.ts:6:  "austria": require("@/assets/flags/austria.png"),
+src/banks/flagsAssets.ts:7:  "brazil": require("@/assets/flags/brazil.png"),
+src/banks/flagsAssets.ts:8:  "canada": require("@/assets/flags/canada.png"),
+src/banks/flagsAssets.ts:9:  "china": require("@/assets/flags/china.png"),
+src/banks/flagsAssets.ts:10:  "finland": require("@/assets/flags/finland.png"),
+src/banks/flagsAssets.ts:11:  "gambia": require("@/assets/flags/gambia.png"),
+src/banks/flagsAssets.ts:12:  "germany": require("@/assets/flags/germany.png"),
+src/banks/flagsAssets.ts:13:  "greece": require("@/assets/flags/greece.png"),
+src/banks/flagsAssets.ts:14:  "hungary": require("@/assets/flags/hungary.png"),
+src/banks/flagsAssets.ts:15:  "iceland": require("@/assets/flags/iceland.png"),
+src/banks/flagsAssets.ts:16:  "italy": require("@/assets/flags/italy.png"),
+src/banks/flagsAssets.ts:17:  "japan": require("@/assets/flags/japan.png"),
+src/banks/flagsAssets.ts:18:  "latvia": require("@/assets/flags/latvia.png"),
+src/banks/flagsAssets.ts:19:  "lithuania": require("@/assets/flags/lithuania.png"),
+src/banks/flagsAssets.ts:20:  "netherlands": require("@/assets/flags/netherlands.png"),
+src/banks/flagsAssets.ts:21:  "norway": require("@/assets/flags/norway.png"),
+src/banks/flagsAssets.ts:22:  "pakistan": require("@/assets/flags/pakistan.png"),
+src/banks/flagsAssets.ts:23:  "rumenia": require("@/assets/flags/rumenia.png"),
+src/banks/flagsAssets.ts:24:  "russia": require("@/assets/flags/russia.png"),
+src/banks/flagsAssets.ts:25:  "serbia": require("@/assets/flags/serbia.png"),
+src/banks/flagsAssets.ts:26:  "spain": require("@/assets/flags/spain.png"),
+src/banks/flagsAssets.ts:27:  "sweden": require("@/assets/flags/sweden.png"),
+src/banks/flagsAssets.ts:28:  "uk": require("@/assets/flags/uk.png"),
+src/banks/flagsAssets.ts:29:  "ukraine": require("@/assets/flags/ukraine.png"),
+src/engine/conductor.ts:1:import { getTotalMeters } from '@/src/state/run';
+src/engine/conductor.ts:2:import { getRouteState } from '@/src/state/route';
+src/banks/extraLife.ts:1:import { Q } from "./types";
+src/banks/extraLife.ts:2:import { shuffle } from "./util";
+src/banks/lightning.ts:1:import type { Q } from "./types";
+src/banks/trick.ts:1:import { Q } from "./types";
+src/banks/trick.ts:2:import { shuffle } from "./util";
+src/banks/bonus.ts:1:import { Q } from "./types";
+src/banks/bonus.ts:2:import { shuffle } from "./util";
+src/banks/buildQuizPool.ts:5:import { ManagedQuestion, normalizeBank } from "@/src/banks/sequence";
+src/banks/buildQuizPool.ts:8:import { easyBank, mediumBank, hardBank, impossibleBank } from "@/src/banks/core";
+src/banks/buildQuizPool.ts:9:import { bonusEasyBank, bonusMediumBank, bonusHardBank } from "@/src/banks/bonus";
+src/banks/buildQuizPool.ts:10:import { trickBank } from "@/src/banks/trick";
+src/banks/buildQuizPool.ts:11:import { revealEasy, revealMedium, revealHard } from "@/src/banks/reveal";
+src/banks/buildQuizPool.ts:12:import { LIGHTNING_BANKS } from "@/src/banks/lightning";
+src/banks/buildQuizPool.ts:13:import { extraLifeBank } from "@/src/banks/extraLife";
+src/banks/buildQuizPool.ts:14:import { buildFlagsQuestions } from "@/src/banks/flagsAdapter";
+src/banks/core.ts:1:import { Q } from "./types";
+src/banks/core.ts:2:import { shuffle } from "./util";
+src/banks/byer.ts:4://   export { byerBank } from "./byer";
+src/banks/byer.ts:8:import type { Q, Difficulty } from "./types";
+src/banks/byer.ts:9:import { shuffle } from "./util";

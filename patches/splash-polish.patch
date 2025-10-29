@@ -1,0 +1,63 @@
+*** Begin Patch
+*** Update File: app/_layout.tsx
+@@
+-// app/_layout.tsx
+-import { Stack } from "expo-router";
+-import { useEffect } from "react";
+-import { View } from "react-native";
+-import * as SplashScreen from "expo-splash-screen";
+-import { StatusBar } from "expo-status-bar";
+-
+-SplashScreen.preventAutoHideAsync(); // hold til init er ferdig
+-
+-export default function RootLayout() {
+-  useEffect(() => {
+-    const init = async () => {
+-      // last fonter/ikoner/data her om du har
+-      // await Font.loadAsync(...), etc.
+-      await new Promise(r => setTimeout(r, 50)); // mini buffer
+-      SplashScreen.hideAsync();
+-    };
+-    init();
+-  }, []);
+-
+-  return (
+-    <View style={{ flex: 1, backgroundColor: "#0b132b" }}>
+-      <StatusBar style="light" />
+-      <Stack screenOptions={{ contentStyle: { backgroundColor: "#0b132b" } }} />
+-    </View>
+-  );
+-}
++// app/_layout.tsx
++import React, { useEffect } from "react";
++import { View } from "react-native";
++import { Stack } from "expo-router";
++import * as SplashScreen from "expo-splash-screen";
++import { StatusBar } from "expo-status-bar";
++
++SplashScreen.preventAutoHideAsync();
++
++export default function RootLayout() {
++  useEffect(() => {
++    let mounted = true;
++    const init = async () => {
++      try {
++        await new Promise((r) => setTimeout(r, 50));
++      } finally {
++        if (mounted) SplashScreen.hideAsync();
++      }
++    };
++    init();
++    return () => {
++      mounted = false;
++    };
++  }, []);
++
++  return (
++    <View style={{ flex: 1, backgroundColor: "#0b132b" }}>
++      <StatusBar style="light" />
++      <Stack screenOptions={{ contentStyle: { backgroundColor: "#0b132b" } }} />
++    </View>
++  );
++}
+*** End Patch

@@ -5,22 +5,20 @@ type Props = {
   visible: boolean;
   fromName: string;
   toName: string;
-  meters: number; // etappelengde i meter
+  meters: number;
+    etappeNo?: number;
   onStart: () => void; // "Sett i gang"
   onClose?: () => void; // hvis du vil kunne lukke uten å starte
 };
 
-export default function StagePoster({ visible, fromName, toName, meters, onStart, onClose }: Props) {
+export default function StagePoster({ visible, fromName, toName, meters, etappeNo, onStart, onClose }: Props) {
   if (!visible) return null;
-
-  const km = Math.max(0, meters) / 1000;
-
   return (
     <View style={styles.wrap} pointerEvents="auto">
       <View style={styles.card}>
-        <Text style={styles.heading}>Neste etappe</Text>
+        <Text style={styles.heading}>{etappeNo ? `Etappe ${etappeNo}` : "Neste etappe"}</Text>
         <Text style={styles.route}>{fromName} → {toName}</Text>
-        <Text style={styles.distance}>{km.toFixed(1)} km</Text>
+        <Text style={styles.distance}>{meters.toLocaleString('no-NO')} m</Text>
 
         <Pressable onPress={onStart} android_ripple={{ color: "#334155" }} style={styles.cta}>
           <Text style={styles.ctaText}>Sett i gang</Text>

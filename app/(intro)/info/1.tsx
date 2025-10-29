@@ -1,40 +1,57 @@
 // app/(intro)/info/1.tsx
-import React from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getProfile } from "@/src/state/profile";
+import WelcomePoster from "@/components/posters/WelcomePoster";
 
 export default function Info1() {
   const router = useRouter();
   const p: any = getProfile?.() || { name: "" };
   const hasProfile = !!(p?.name && String(p.name).trim().length > 0);
 
-  const onContinue = () => {
+  const [ready, setReady] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const flag = await AsyncStorage.getItem("app:welcomeShown");
+        if (!mounted) return;
+        setShowWelcome(flag ? false : true); // vis bare første gang
+      } catch {
+        if (!mounted) return;
+        setShowWelcome(true);
+      } finally {
+        if (mounted) setReady(true);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const onContinue = async () => {
+    try { await AsyncStorage.setItem("app:welcomeShown", "1"); } catch {}
     if (hasProfile) router.replace("/info/2");
-    else router.push("/profile");
+    else router.replace("/profile");
   };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: "#0b132b", padding: 24, justifyContent: "center", gap: 12 }}>
-      <Text style={{ color: "white", fontSize: 24, fontWeight: "800", textAlign: "center", marginBottom: 8 }}>
-        Velkommen!
-      </Text>
-      <Text style={{ color: "#cbd5e1", fontSize: 16, textAlign: "center" }}>
-        Dette er infosiden ved oppstart. Trykk Fortsett for å komme i gang.
-      </Text>
+  useEffect(() => {
+    if (!ready) return;
+    if (!showWelcome) {
+      if (hasProfile) router.replace("/info/2");
+      else router.replace("/profile");
+    }
+  }, [ready, showWelcome]);
 
-      <Pressable
-        onPress={onContinue}
-        style={{ marginTop: 16, backgroundColor: "#2563eb", borderRadius: 12, padding: 14 }}
-      >
-        <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>
-          Fortsett
-        </Text>
-      </Pressable>
+  if (!ready) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#0b132b", justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: "#94a3b8" }}>Laster…</Text>
+      </View>
+    );
+  }
 
-      <Text style={{ color: "#9ca3af", textAlign: "center", marginTop: 6 }}>
-        {hasProfile ? `Profil funnet (${p.name}) – går til neste infoside.` : "Nytt spill – vi spør etter profil først."}
-      </Text>
-    </View>
-  );
+  return <WelcomePoster visible={showWelcome} onContinue={onContinue} />;
 }
