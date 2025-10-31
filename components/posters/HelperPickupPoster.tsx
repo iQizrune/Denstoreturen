@@ -16,7 +16,7 @@ export default function HelperPickupPoster({ visible, helper, onAccept, onClose 
   const src = getHelperImage(helper);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={() => {}}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <Text style={styles.h1}>Nytt hjelpemiddel!</Text>
@@ -28,18 +28,16 @@ export default function HelperPickupPoster({ visible, helper, onAccept, onClose 
             Dette hjelpemidlet legges i sekken din. Du kan bruke det på riktig stopp.
           </Text>
 
-          <View style={styles.row}>
-            <Pressable style={[styles.btn, styles.btnGhost]} onPress={onClose} accessibilityRole="button">
-              <Text style={styles.btnGhostTxt}>Senere</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.btn, styles.btnPrimary]}
-              onPress={() => onAccept(helper)}
-              accessibilityRole="button"
-            >
-              <Text style={styles.btnPrimaryTxt}>Legg i sekken</Text>
-            </Pressable>
-          </View>
+          <View style={[styles.row, { justifyContent: "center" }]}>
+  <Pressable
+    style={[styles.btn, styles.btnPrimary]}
+    onPress={() => onAccept(helper)}
+    accessibilityRole="button"
+  >
+    <Text style={styles.btnPrimaryTxt}>Legg i sekken</Text>
+  </Pressable>
+</View>
+
         </View>
       </View>
     </Modal>

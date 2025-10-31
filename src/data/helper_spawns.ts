@@ -11,6 +11,7 @@ export type HelperSpawn = {
 };
 
 export const HELPER_SPAWNS: HelperSpawn[] = [
+    { meters: 200, helper: "sanden" as HelperKey }, // Mandal (Sjøsanden)
   // Fylles inn senere: { meters: 12345, helper: "din-nokkel", once: true },
 ];
 

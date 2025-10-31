@@ -27,6 +27,10 @@ import HelperPickupPoster from "../components/posters/HelperPickupPoster";
 import { maybeTriggerHelperPickup } from "../src/engine/triggers/helperPickup";
 import { addHelp } from "../src/state/helpersStore";
 import type { HelperKey } from "../src/types/helpers";
+import HelperPickupGate from "../src/engine/HelperPickupGate";
+// Hvis du ikke bruker alias i denne fila, bruk:
+// import HelperPickupGate from "../src/engine/HelperPickupGate";
+
 
 
 
@@ -198,6 +202,8 @@ useEffect(() => {
 
   const router = useRouter();
   const { meters, remaining, goalName } = useHUDStatus();
+  const [paused, setPaused] = React.useState(false);
+
   const [stopVisible, setStopVisible] = useState(false);
   const __guard_noop_stop: React.EffectCallback = () => {};
 useEffect(__guard_noop_stop, [stopVisible]); // takePendingStageStart
@@ -481,13 +487,26 @@ useEffect(() => {
       </View>
 
       {/* Main Quiz Area */}
-      <View style={{ flex: 1 }}>
-        {PlayingPanels ? (
-          <PlayingPanels roundSeed={roundSeed} />
-        ) : (
-          <Text style={styles.loadingText}>Laster quiz...</Text>
-        )}
-      </View>
+<View style={{ flex: 1 }}>
+  {PlayingPanels ? (
+    paused ? (
+      // Hard pause: unmount quiz while poster is open
+      <View style={{ flex: 1 }} />
+    ) : (
+      <PlayingPanels roundSeed={roundSeed} />
+    )
+  ) : (
+    <Text style={styles.loadingText}>Laster quiz...</Text>
+  )}
+</View>
+
+
+      {/* Hjelpemiddel-plakat ved nye spawns */}
+      <HelperPickupGate
+  totalMeters={meters}
+  onPause={() => setPaused(true)}
+  onResume={() => setPaused(false)}
+/>
 
       {/* Dev-knapp: Hopp ELLER vis plakatvelgeren */}
       <Pressable onPress={devJump} style={styles.devBtn}>

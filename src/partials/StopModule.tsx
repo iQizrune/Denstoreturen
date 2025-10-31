@@ -15,6 +15,10 @@ import RewardToast from "@/components/posters/RewardToast";
 import { publishAwardCoat } from "@/src/app-moved/kartBus";
 import { queueStageStart } from "@/src/lib/stageQueue";
 import { getStops } from "@/src/state/route";
+import { markWon, markLost } from "../state/helpersStore";
+import type { HelperKey } from "../types/helpers";
+
+
 
 // Tillat også StopQ fra adapter (har isCorrect på option, ikke correctId på q)
 import type { StopQ as AdapterStopQ } from "@/src/banks/stopQuizAdapter";
@@ -487,7 +491,7 @@ export default function StopModule(props: StopModuleProps) {
 
                     mineTingStore.openSelectHelper({
                       title: "Velg hjelpemiddel",
-                      onPick: (item: { key: string }) => {
+                      onPick: async (item: { key: string }) => {
                         // Rydd timer hvis satt
                         if (helperTimerRef.current) {
                           clearTimeout(helperTimerRef.current);
@@ -499,6 +503,7 @@ export default function StopModule(props: StopModuleProps) {
                         if (isCorrect) {
                           // Marker brukt riktig + del ut byvåpen (slug!)
                           try { mineTingStore.setItemStatusByKey(item.key, "used-correct"); } catch {}
+                          try { await markWon(item.key as HelperKey); } catch {}
                           try { addCoat(stopSlug); } catch {}
                           try { publishAwardCoat({ type: "award-coat", stopId: stopSlug, perfect: false }); } catch {}
                           setAwardedLocal(true);
@@ -513,7 +518,8 @@ export default function StopModule(props: StopModuleProps) {
                           }, 1600);
                         } else {
                           if (item.key) {
-                            try { mineTingStore.setItemStatusByKey(item.key, "used-wrong"); } catch {}
+                          try { await markLost(item.key as HelperKey); } catch {}
+
                           }
                           setHelperFeedback("fail");
                           helperTimerRef.current = setTimeout(() => {
