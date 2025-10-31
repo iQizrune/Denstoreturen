@@ -18,6 +18,7 @@ import type { RouteLeg } from "@/src/types/route";
 import MapViewHybrid from "@/components/map/MapViewHybrid";
 import ArrivalPoster from "@/components/posters/ArrivalPoster";
 import StopModule from "../src/partials/StopModule"; 
+import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 
 
 export default function KartSvgScreen() {
@@ -53,13 +54,19 @@ export default function KartSvgScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Kart over ruten</Text>
         
-        {/* 1. LUKKEKNAPP (Navigator Back) */}
-        <Pressable 
-  onPress={() => (router.canGoBack() ? router.back() : router.replace('/play'))}
-  style={styles.closeButton} 
+       {/* 1. LUKKEKNAPP (Navigator Back) */}
+<Pressable
+onPress={() => {
+  if (router.canGoBack()) router.back();
+  else router.replace("/play");
+}}
+
+
+  style={styles.closeButton}
 >
-    <Text style={styles.closeButtonText}>Lukk</Text>
+  <Text style={styles.closeButtonText}>Lukk</Text>
 </Pressable>
+
         
         {/* 2. ETAPPE STATUS (Flyttet til høyre med marginLeft: 'auto') */}
         <Text style={styles.sub}>Etapper: {legsCount}</Text>

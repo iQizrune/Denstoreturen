@@ -22,6 +22,12 @@ import { installBagPersistence } from "../components/bag/bagPersist"; // tilpass
 import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 import { installStatsPersistence } from "@/components/bag/statsPersist";
 import { startSession, stopSession } from "@/components/bag/statsStore";
+import { useIsFocused } from "@react-navigation/native";
+
+
+
+
+
 
 // Lokal alias så guarden ser "stageQueue" uten at lib må eksportere den navngitt
 const stageQueue: any =
@@ -236,6 +242,8 @@ useEffect(() => {
   }
 }
 
+
+
 }, [stagePayload, devPoster, mineOpen]);
 
 // Sikkerhetsnett ved unmount
@@ -312,6 +320,13 @@ useEffect(() => {
       }
     }
   }, [stopVisible]);
+  // Konsumer evt. retur fra kart når /play får fokus
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused) {
+      mineTingStore.consumeReturnAction();
+    }
+  }, [isFocused]);
 
   // --- Handlere ---
 

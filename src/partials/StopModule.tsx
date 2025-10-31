@@ -29,19 +29,31 @@ const toSlug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-function openPostStagePanel(next: () => void) {
+function openPostStagePanel(next: () => void, openMap: () => void) {
   // Viser «Mine ting» med footer-knapper (Åpne kart + Neste etappe) og låser Lukk
   // NB: Bruker global store-API som du allerede har i prosjektet.
   // @ts-ignore – importeres via alias der du har den
   const { mineTingStore } = require("@/src/features/mine-ting/mineTingStore");
   mineTingStore.openPanelWithFooterButtons(
     [
-      { label: "Åpne kart", onPress: () => router.push("/kart"), variant: "ghost" },
+      {
+        label: "Åpne kart",
+        onPress: () => {
+  // Registrer retur: når kart lukkes / play får fokus, gjenåpne samme plakat
+  mineTingStore.setReturnAction(() => openPostStagePanel(next, openMap));
+  // Åpne kart (IKKE exit StopModule)
+  openMap();
+},
+
+        variant: "ghost",
+      },
       { label: "Neste etappe", onPress: next, variant: "primary" },
     ],
     true
   );
 }
+
+
 
 // Hvilket hjelpemiddel er riktig per by/stopp (slug -> helperKey)
 const CORRECT_HELPER_FOR_STOP_SLUG: Record<string, string> = {
@@ -76,6 +88,7 @@ export type StopModuleProps = {
   onComplete?: (r: { stopName: string; correct: number; total: number }) => void;
 
   onExit: () => void;
+  origin?: "play" | "mine";
 };
 
 // ===== Konstanter =====
@@ -84,6 +97,8 @@ const TICK_MS = 100;
 const AWARD_MIN_CORRECT = 5; // 5 av 6 gir byvåpen
 
 export default function StopModule(props: StopModuleProps) {
+  const { origin = "play" } = props;
+  
   const {
     visible,
     stopName,
@@ -105,6 +120,8 @@ export default function StopModule(props: StopModuleProps) {
 
   const [bagOpen, setBagOpen] = useState(false);
   const [awardedLocal, setAwardedLocal] = useState(false);
+  const [forceMinePanel, setForceMinePanel] = useState(false);
+
 
   // Hjelpemiddel-dialog (kun når correct === 4)
   const [helpOpen, setHelpOpen] = useState(false);
@@ -302,7 +319,7 @@ export default function StopModule(props: StopModuleProps) {
         helperTimerRef.current = setTimeout(() => {
           setShowAwardToast(false);
           setAwardCount(null);
-          openPostStagePanel(() => proceedNextEtappe());
+        openPostStagePanel(() => proceedNextEtappe(), () => { if (onOpenMap) onOpenMap(); else router.push("/kart"); });
         }, 3000);
       });
       return;
@@ -319,7 +336,7 @@ export default function StopModule(props: StopModuleProps) {
         helperTimerRef.current = setTimeout(() => {
           setShowAwardToast(false);
           setAwardCount(null);
-          openPostStagePanel(() => proceedNextEtappe());
+          openPostStagePanel(() => proceedNextEtappe(), () => onOpenMap?.() ?? router.push("/kart"));
         }, 1600);
       });
     }
@@ -490,7 +507,8 @@ export default function StopModule(props: StopModuleProps) {
                           helperTimerRef.current = setTimeout(() => {
                             setHelperFeedback(null);
                             InteractionManager.runAfterInteractions(() => {
-                              setTimeout(() => openPostStagePanel(() => proceedNextEtappe()), 100);
+                            setTimeout(() => openPostStagePanel(() => proceedNextEtappe(), () => { if (onOpenMap) onOpenMap(); else router.push("/kart"); }), 100);
+
                             });
                           }, 1600);
                         } else {
@@ -501,7 +519,8 @@ export default function StopModule(props: StopModuleProps) {
                           helperTimerRef.current = setTimeout(() => {
                             setHelperFeedback(null);
                             InteractionManager.runAfterInteractions(() => {
-                              setTimeout(() => openPostStagePanel(() => proceedNextEtappe()), 100);
+                            setTimeout(() => openPostStagePanel(() => proceedNextEtappe(), () => { if (onOpenMap) onOpenMap(); else router.push("/kart"); }), 100);
+
                             });
                           }, 1500);
                         }
@@ -530,7 +549,7 @@ export default function StopModule(props: StopModuleProps) {
         </Modal>
 
         {/* LEGACY: Byquiz ferdig-panel – vises KUN når ingen toast er aktiv */}
-        {!(helperFeedback || showAwardToast) && (
+        {false && !(helperFeedback || showAwardToast) && (
           <View
             style={{
               width: "90%", maxWidth: 420,

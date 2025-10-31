@@ -29,6 +29,8 @@ class MineTingStore {
   // Footer-knapper og close-lås
   private _footerButtons: FooterBtn[] = [];
   private _lockClose = false;
+  private _returnAction: (() => void) | undefined = undefined;
+  
 
   // midlertidig demo-data (byttes ut når ekte state kobles)
   private _items: HelpItem[] = [
@@ -126,6 +128,25 @@ class MineTingStore {
     this._lockClose = lockClose;
     this.notify();
   }
+    public setReturnAction(fn: (() => void) | undefined) {
+    this._returnAction = fn;
+    // valgfritt: this.notify();
+  }
+
+  public consumeReturnAction(): boolean {
+    const fn = this._returnAction;
+    this._returnAction = undefined;
+    if (fn) {
+      try { fn(); } catch {}
+      return true;
+    }
+    return false;
+  }
+  public hasReturnAction(): boolean {
+  return !!this._returnAction;
+}
+
+
 
   triggerFooterAction() {
     const btn = this._footerButtons[0];
