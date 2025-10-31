@@ -11,6 +11,11 @@ import { COAT_IMAGES as coatImages } from "@/src/data/coat_images";
 import type { StatsSnapshotV1 } from "@/components/bag/statsTypes";
 import { getItems as getBagItems, subscribe as subscribeBag } from "@/components/bag/bagStore";
 import * as stats from "@/components/bag/statsStore";
+import { subscribe as subscribeHelpers, getAll as getAllHelpers } from "@/src/state/helpersStore";
+import type { HelperKey } from "@/src/types/helpers";
+import type { HelpStatus } from "@/src/types/helpStatus";
+import { getHelperImage } from "@/src/data/helper_images";
+
 
 
 type Coat = { city: string };
@@ -30,9 +35,16 @@ function formatHMS(totalSeconds: number): string {
 export default function MineTingPanel() {
   const [open, setOpen] = useState(mineTingStore.open);
   const [mode, setMode] = useState(mineTingStore.mode);
-  const [items, setItems] = useState<HelpItem[]>(mineTingStore.items);
+  const [items, setItems] = useState<HelpItem[]>([]);
   const [footerButtons, setFooterButtons] = useState(mineTingStore.footerButtons);
   const [lockClose, setLockClose] = useState(mineTingStore.lockClose);
+
+  function titleFromKey(k: string) {
+  return k
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 
   // Byvåpen fra samme state som 5/6-rutinen
   const [coats, setCoats] = useState<Coat[]>(() =>
@@ -50,14 +62,45 @@ export default function MineTingPanel() {
     const offLocal = mineTingStore.subscribe(() => {
       setOpen(mineTingStore.open);
       setMode(mineTingStore.mode);
-      setItems(mineTingStore.items);
       setFooterButtons(mineTingStore.footerButtons);
       setLockClose(mineTingStore.lockClose);
     });
+      // 🔽 4A) Abonner på helpersStore og bygg items fra helpers (ekte kilde)
+  const offHelpers = subscribeHelpers(() => {
+    const map = getAllHelpers(); // Record<HelperKey, HelpStatus>
+    const next: HelpItem[] = Object.entries(map).map(([key, status]) => ({
+      id: key,
+      key,
+      name: titleFromKey(key),
+      status:
+        status === "unused" ? "collected" :
+        status === "won"    ? "used-correct" :
+                              "used-wrong",
+    }));
+    setItems(next);
+  });
+
+  // Initial sync ved mount (før første event kommer)
+{
+  const map = getAllHelpers();
+  const next: HelpItem[] = Object.entries(map).map(([key, status]) => ({
+    id: key,
+    key,
+    name: titleFromKey(key),
+    status:
+      status === "unused" ? "collected" :
+      status === "won"    ? "used-correct" :
+                            "used-wrong",
+  }));
+  setItems(next);
+}
+
+
 
     return () => {
       offBag?.();
       offLocal?.();
+      offHelpers?.();
     };
   }, []);
 
@@ -196,7 +239,8 @@ useEffect(() => {
             </Text>
             <View style={styles.grid}>
               {items.map((it) => {
-                const icon = itemIconMap[it.key];
+                let icon: any;
+try { icon = getHelperImage(it.key as HelperKey); } catch { icon = undefined; }
                 const isSelectable = selectableIds.has(it.id);
                 const stateStyle =
                   it.status === "used-correct"
