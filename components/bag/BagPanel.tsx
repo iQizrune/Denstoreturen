@@ -7,46 +7,135 @@ import {
   Pressable,
   StyleSheet,
   AccessibilityInfo,
+  Image,
 } from "react-native";
+
+// Bestående bag (byvåpen) – uendret
 import { getItems, subscribe, BagItem } from "@/components/bag/bagStore";
 import { BagIcon } from "@/components/bag/BagIcon";
 
+// HJELPEMIDLER (nytt) – relative importer til src/
+// Justér stiene hvis mappestrukturen er annerledes hos deg.
+import {
+  subscribe as subscribeHelps,
+  isHydrated as helpsHydrated,
+  hydrateHelpers,
+  getAll as getHelpsMap,
+  listUnused,
+  listWon,
+  listLost,
+} from "../../src/state/helpersStore";
+import { getHelperImage } from "../../src/data/helper_images";
+import type { HelperKey } from "../../src/types/helpers";
+import type { HelpStatus } from "../../src/types/helpStatus";
+
+type HelpsMap = Partial<Record<HelperKey, HelpStatus>>;
+
+
+
+
 type Props = {
   onClose?: () => void;
-  visible?: boolean;      // ny
-  onOpenMap?: () => void; // ny (kan ignoreres)
-  title?: string;         // ny (kan ignoreres)
+  visible?: boolean;
+  onOpenMap?: () => void;
+  title?: string;
 };
+
+// Enkel “tile” for et hjelpemiddel
+function HelpTile({ keyName, status }: { keyName: HelperKey; status: HelpStatus }) {
+  const img = getHelperImage(keyName);
+  const palette =
+    status === "won"
+      ? { border: "#c6a700", fg: "#fde68a" } // gyllen
+      : status === "lost"
+      ? { border: "#475569", fg: "#94a3b8" } // grålig
+      : { border: "#2563eb", fg: "#dbeafe" }; // unused (blå aksent)
+
+  return (
+    <View style={[styles.helpCard, { borderColor: palette.border }]}>
+      {/* Bruker BagIcon-mønsteret: men her rendres bare et Image via require() */}
+      {/* Hvis du har en felles <BagIcon> som også kan vise helpers, si fra – så bytter vi til den. */}
+      <View style={styles.helpIconBox}>
+        {/* @ts-ignore: React Native Image via require */}
+        <Image source={img} style={{ width: 56, height: 56, resizeMode: "contain" }} />
+      </View>
+      <Text style={[styles.helpTitle, { color: palette.fg }]}>{keyName}</Text>
+      <Text style={styles.helpMeta}>
+        {status === "unused" ? "ubrukt" : status === "won" ? "vunnet" : "tapt"}
+      </Text>
+    </View>
+  );
+}
 
 export default function BagPanel({ onClose, visible = true }: Props) {
   if (!visible) return null;
-  const [items, setItems] = useState<BagItem[]>(() => getItems());
 
+  // BYVÅPEN (som før)
+  const [items, setItems] = useState<BagItem[]>(() => getItems());
   useEffect(() => {
     const off = subscribe(() => setItems(getItems()));
     return off;
   }, []);
-
   const coats = useMemo(
     () => items.filter((i): i is Extract<BagItem, { kind: "coat" }> => i.kind === "coat"),
     [items]
   );
 
+  // HJELPEMIDLER (nytt)
+  const [helpsSnapshot, setHelpsSnapshot] = useState<HelpsMap>({});
+
+
+  useEffect(() => {
+    let didCancel = false;
+
+    // Sørg for hydrering én gang
+    (async () => {
+      if (!helpsHydrated()) {
+        await hydrateHelpers();
+      }
+      if (didCancel) return;
+      setHelpsSnapshot(getHelpsMap());
+    })();
+
+    // Abonner på endringer
+    const off = subscribeHelps((state: HelpsMap) => {
+  if (didCancel) return;
+  setHelpsSnapshot(state);
+});
+
+
+
+    return () => {
+      didCancel = true;
+      off?.();
+    };
+  }, []);
+  
+
+  const helpKeysUnused = useMemo(() => listUnused(), [helpsSnapshot]);
+  const helpKeysWon = useMemo(() => listWon(), [helpsSnapshot]);
+  const helpKeysLost = useMemo(() => listLost(), [helpsSnapshot]);
+
   const renderCoat = useCallback(
     ({ item }: { item: Extract<BagItem, { kind: "coat" }> }) => (
-      <View style={styles.coatCard} accessible accessibilityRole="imagebutton" accessibilityLabel={`Byvåpen ${item.city}`}>
+      <View
+        style={styles.coatCard}
+        accessible
+        accessibilityRole="imagebutton"
+        accessibilityLabel={`Byvåpen ${item.city}`}
+      >
         <BagIcon slug={item.city} city={item.city} size={64} />
         <Text style={styles.coatTitle}>🛡️ {item.city}</Text>
-        <Text style={styles.coatMeta}>
-          {new Date(item.earnedAt).toLocaleDateString()}
-        </Text>
+        <Text style={styles.coatMeta}>{new Date(item.earnedAt).toLocaleDateString()}</Text>
       </View>
     ),
     []
   );
 
   const focusListForA11y = () => {
-    AccessibilityInfo.announceForAccessibility?.("Mine ting. Rull horisontalt for å se flere.");
+    AccessibilityInfo.announceForAccessibility?.(
+      "Mine ting. Rull horisontalt for å se flere."
+    );
   };
 
   return (
@@ -65,11 +154,13 @@ export default function BagPanel({ onClose, visible = true }: Props) {
         )}
       </View>
 
+      {/* BYVÅPEN – uendret */}
       <Text style={styles.sectionLabel}>Byvåpen</Text>
-
       {coats.length === 0 ? (
         <View style={styles.emptyBox}>
-          <Text style={styles.emptyTxt}>Ingen byvåpen enda. Klarer du 5 riktige på et stopp?</Text>
+          <Text style={styles.emptyTxt}>
+            Ingen byvåpen enda. Klarer du 5 riktige på et stopp?
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -84,6 +175,73 @@ export default function BagPanel({ onClose, visible = true }: Props) {
           style={styles.list}
           onLayout={focusListForA11y}
         />
+      )}
+
+      {/* HJELPEMIDLER – ny seksjon */}
+      <Text style={[styles.sectionLabel, { marginTop: 16 }]}>Hjelpemidler</Text>
+
+      {helpKeysUnused.length + helpKeysWon.length + helpKeysLost.length === 0 ? (
+        <View style={styles.emptyBox}>
+          <Text style={styles.emptyTxt}>
+            Ingen hjelpemidler enda. De dukker opp som plakater underveis på etappen.
+          </Text>
+        </View>
+      ) : (
+        <>
+          {/* Ubrukt */}
+          {helpKeysUnused.length > 0 && (
+            <>
+              <Text style={styles.pillLabel}>Tilgjengelige</Text>
+              <FlatList
+                data={helpKeysUnused}
+                keyExtractor={(k) => `u-${k}`}
+                renderItem={({ item }) => <HelpTile keyName={item} status="unused" />}
+                horizontal
+                scrollEnabled
+                nestedScrollEnabled
+                showsHorizontalScrollIndicator={true}
+                contentContainerStyle={styles.listContent}
+                style={styles.list}
+              />
+            </>
+          )}
+
+          {/* Vunnet */}
+          {helpKeysWon.length > 0 && (
+            <>
+              <Text style={styles.pillLabel}>Brukt riktig</Text>
+              <FlatList
+                data={helpKeysWon}
+                keyExtractor={(k) => `w-${k}`}
+                renderItem={({ item }) => <HelpTile keyName={item} status="won" />}
+                horizontal
+                scrollEnabled
+                nestedScrollEnabled
+                showsHorizontalScrollIndicator={true}
+                contentContainerStyle={styles.listContent}
+                style={styles.list}
+              />
+            </>
+          )}
+
+          {/* Tapt */}
+          {helpKeysLost.length > 0 && (
+            <>
+              <Text style={styles.pillLabel}>Brukt feil</Text>
+              <FlatList
+                data={helpKeysLost}
+                keyExtractor={(k) => `l-${k}`}
+                renderItem={({ item }) => <HelpTile keyName={item} status="lost" />}
+                horizontal
+                scrollEnabled
+                nestedScrollEnabled
+                showsHorizontalScrollIndicator={true}
+                contentContainerStyle={styles.listContent}
+                style={styles.list}
+              />
+            </>
+          )}
+        </>
       )}
     </View>
   );
@@ -158,5 +316,41 @@ const styles = StyleSheet.create({
   emptyTxt: {
     color: "#94A3B8",
     textAlign: "center",
+  },
+
+  // Hjelpemidler
+  pillLabel: {
+    color: "#a5b4fc",
+    fontSize: 12,
+    marginTop: 8,
+    marginBottom: 6,
+    fontWeight: "700",
+  },
+  helpCard: {
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: "#0e1726",
+    borderWidth: 1,
+    marginRight: 8,
+    alignItems: "center",
+    minWidth: 120,
+  },
+  helpIconBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#0b1220",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  helpTitle: {
+    fontWeight: "800",
+    marginTop: 8,
+  },
+  helpMeta: {
+    color: "#9ca3af",
+    marginTop: 4,
+    fontSize: 12,
   },
 });

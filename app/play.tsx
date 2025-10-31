@@ -23,6 +23,11 @@ import { mineTingStore } from "@/src/features/mine-ting/mineTingStore";
 import { installStatsPersistence } from "@/components/bag/statsPersist";
 import { startSession, stopSession } from "@/components/bag/statsStore";
 import { useIsFocused } from "@react-navigation/native";
+import HelperPickupPoster from "../components/posters/HelperPickupPoster";
+import { maybeTriggerHelperPickup } from "../src/engine/triggers/helperPickup";
+import { addHelp } from "../src/state/helpersStore";
+import type { HelperKey } from "../src/types/helpers";
+
 
 
 
@@ -201,7 +206,7 @@ useEffect(__guard_noop_stop, [stopVisible]); // takePendingStageStart
   const [devPoster, setDevPoster] = useState<DevPosterId>("none");
   const [roundSeed, setRoundSeed] = useState(0);
 const stopGraceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+const [helperPoster, setHelperPoster] = useState<HelperKey | null>(null);
   const playingRef = useRef(false);
 
 // Debounce STOP slik at forbigående panel/plakat ikke nuller tid umiddelbart
